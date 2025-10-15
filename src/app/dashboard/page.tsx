@@ -1,13 +1,12 @@
 "use client";
 
-import Navbar from "./components/Navbar";
-
 import React from "react";
 import styles from "./dashboard.module.css";
 import { FiUsers, FiDollarSign, FiCheckCircle, FiAlertCircle, FiUserPlus } from "react-icons/fi";
-import StatsCard from "./components/StatsCard";
-import RevenueChart from "./components/RevenueChart";
-import StationUtilizationChart from "./components/StationUtilizationChart";
+import StatsCard from "../../components/StatsCard";
+import RevenueChart from "../../components/RevenueChart";
+import StationUtilizationChart from "../../components/StationUtilizationChart";
+import Navbar from "../../components/Navbar/Navbar";
 
 const Dashboard: React.FC = () => {
     return (

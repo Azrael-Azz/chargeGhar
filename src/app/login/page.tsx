@@ -4,9 +4,7 @@ import React, { useState } from "react";
 import type { FormEvent } from "react";
 import styles from "./login.module.css";
 import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import logo from "../../../public/ChargeGharLogo.png";
 
 const Login: React.FC = () => {
     const router = useRouter();
@@ -36,19 +34,22 @@ const Login: React.FC = () => {
             setLoading(false);
         }
     };
-
+    console.log("Image path:", "/ChargeCharLogo.png");
     return (
         <div className={styles.loginPage}>
             {/* Left Section */}
             <div className={styles.loginLeft}>
                 <div className={styles.overlayWaves}></div>
                 <div className={styles.brand}>
-                    <Image
-                        src={logo}
+                    <img
+                        src="/ChargeGharLogo.png"
                         alt="Charge Ghar Logo"
                         className={styles.brandLogo}
-                        priority
+                        width={300}
+                        height={50}
                     />
+
+
                 </div>
             </div>
 

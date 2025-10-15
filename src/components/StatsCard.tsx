@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../dashboard.module.css";
+import styles from "../app/dashboard/dashboard.module.css";
 
 interface Props {
     icon: React.ReactNode;
