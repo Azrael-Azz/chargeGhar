@@ -1,26 +1,73 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Image from "next/image";
-import { FiBell, FiUser } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import { FiBell, FiUser, FiLogOut, FiSettings } from "react-icons/fi";
 import logo from "../../../public/ChargeGharLogo.png";
 
 const Header: React.FC = () => {
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleProfileClick = () => {
+        setDropdownOpen(false);
+        router.push("/profile");
+    };
+
+    const handleLogout = () => {
+        // Placeholder for actual logout logic
+        localStorage.removeItem("authToken"); // example cleanup
+        setDropdownOpen(false);
+        router.push("/login");
+    };
+
     return (
         <header className={styles.header}>
-            {/* Logo */}
+            {/* Logo Section */}
             <div className={styles.logoContainer}>
                 <Image src={logo} alt="ChargeGhar Logo" className={styles.logo} priority />
             </div>
 
-            {/* Right side icons */}
+            {/* Right Section */}
             <div className={styles.rightSection}>
+                {/* Notification Icon */}
                 <button className={styles.iconButton} aria-label="Notifications">
                     <FiBell />
                 </button>
-                <div className={styles.profile}>
-                    <FiUser />
+
+                {/* Profile Dropdown */}
+                <div className={styles.profileWrapper} ref={dropdownRef}>
+                    <div
+                        className={styles.profile}
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                        <FiUser />
+                    </div>
+
+                    {dropdownOpen && (
+                        <div className={styles.dropdownMenu}>
+                            <button onClick={handleProfileClick}>
+                                <FiUser className={styles.dropdownIcon} /> Profile
+                            </button>
+                            <button onClick={handleLogout}>
+                                <FiLogOut className={styles.dropdownIcon} /> Logout
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>
