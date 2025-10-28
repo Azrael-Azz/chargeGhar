@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import styles from "../../Add/AddStation.module.css";
+import styles from "../add/add.module.css";
 import { FiSave, FiX } from "react-icons/fi";
 
 const EditStation: React.FC = () => {
