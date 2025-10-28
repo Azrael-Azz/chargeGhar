@@ -1,0 +1,18 @@
+[
+  {
+    "id": "U001",
+    "name": "User One",
+    "email": "user1@email.com",
+    "phone": "9841111111",
+    "rentals": "3",
+    "createdAt": "08/09/2025"
+  },
+  {
+    "id": "U002",
+    "name": "User Two",
+    "email": "user2@email.com",
+    "phone": "9852222222",
+    "rentals": "5",
+    "createdAt": "08/09/2025"
+  }
+]

@@ -18,10 +18,10 @@ const StationsPage: React.FC = () => {
     const router = useRouter();
 
     const [stations, setStations] = useState<Station[]>([
-        { id: 1, name: "Station A", location: "Mumbai", status: "Active", chargers: 12, utilization: 76 },
-        { id: 2, name: "Station B", location: "Pune", status: "Offline", chargers: 8, utilization: 0 },
-        { id: 3, name: "Station C", location: "Delhi", status: "Active", chargers: 15, utilization: 58 },
-        { id: 4, name: "Station D", location: "Bangalore", status: "Maintenance", chargers: 10, utilization: 22 },
+        { id: 1, name: "Station A", location: "MachhaPokhari", status: "Active", chargers: 12, utilization: 76 },
+        { id: 2, name: "Station B", location: "chabhahil", status: "Offline", chargers: 8, utilization: 0 },
+        { id: 3, name: "Station C", location: "Delhi bzzar", status: "Active", chargers: 15, utilization: 58 },
+        { id: 4, name: "Station D", location: "Bangbazzar", status: "Maintenance", chargers: 10, utilization: 22 },
     ]);
 
     const [search, setSearch] = useState("");
@@ -39,11 +39,11 @@ const StationsPage: React.FC = () => {
     };
 
     const handleEdit = (id: number) => {
-        router.push(`/dashboard/stations/edit/${id}`);
+        router.push(`/stations/edit/${id}`);
     };
 
     const handleAdd = () => {
-        router.push("/dashboard/stations/add");
+        router.push("/stations/add");
     };
 
     return (

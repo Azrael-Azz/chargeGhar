@@ -1,89 +1,145 @@
 "use client";
 
 import React, { useState } from "react";
+import styles from "./add.module.css";
 import { useRouter } from "next/navigation";
-import styles from "./AddStation.module.css";
-import { FiSave, FiX } from "react-icons/fi";
+import { FaCoffee, FaRestroom, FaStore, FaParking, FaCouch } from "react-icons/fa";
+import { FiChevronRight } from "react-icons/fi";
 
-const AddStation: React.FC = () => {
-    const router = useRouter();
+const AddStationPage: React.FC = () => {
+  const router = useRouter();
+  const [stationName, setStationName] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [location, setLocation] = useState("");
+  const [powerbanks, setPowerbanks] = useState("");
+  const [amenities, setAmenities] = useState<string[]>([]);
 
-    const [form, setForm] = useState({
-        name: "",
-        location: "",
-        status: "Active",
-        chargers: 0,
-        utilization: 0,
-    });
+  const amenityOptions = [
+    { name: "Cafe", icon: <FaCoffee /> },
+    { name: "Toilet", icon: <FaRestroom /> },
+    { name: "Lounge", icon: <FaCouch /> },
+    { name: "Store", icon: <FaStore /> },
+    { name: "Parking", icon: <FaParking /> },
+  ];
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log("New Station:", form);
-        router.push("/dashboard/stations");
-    };
-
-    return (
-        <div className={styles.container}>
-            <h1>Add New Station</h1>
-
-            <form onSubmit={handleSubmit} className={styles.form}>
-                <label>Station Name</label>
-                <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                />
-
-                <label>Location</label>
-                <input
-                    type="text"
-                    value={form.location}
-                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    required
-                />
-
-                <label>Status</label>
-                <select
-                    value={form.status}
-                    onChange={(e) => setForm({ ...form, status: e.target.value })}
-                >
-                    <option>Active</option>
-                    <option>Offline</option>
-                    <option>Maintenance</option>
-                </select>
-
-                <label>Chargers</label>
-                <input
-                    type="number"
-                    value={form.chargers}
-                    onChange={(e) => setForm({ ...form, chargers: Number(e.target.value) })}
-                    required
-                />
-
-                <label>Utilization (%)</label>
-                <input
-                    type="number"
-                    value={form.utilization}
-                    onChange={(e) => setForm({ ...form, utilization: Number(e.target.value) })}
-                    required
-                />
-
-                <div className={styles.buttons}>
-                    <button type="submit" className={styles.save}>
-                        <FiSave /> Save
-                    </button>
-                    <button
-                        type="button"
-                        className={styles.cancel}
-                        onClick={() => router.push("/dashboard/stations")}
-                    >
-                        <FiX /> Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
+  const handleAmenityToggle = (amenity: string) => {
+    setAmenities((prev) =>
+      prev.includes(amenity)
+        ? prev.filter((a) => a !== amenity)
+        : [...prev, amenity]
     );
+  };
+
+  const handleNext = () => {
+    alert("Next Step Clicked ✅");
+  };
+
+  return (
+    <div className={styles.container}>
+      <div>
+        <div className={styles.header}>
+          <h1>Station Details</h1>
+          <p>Station / Edit Station Details</p>
+        </div>
+
+        <div className={styles.progress}>
+          <div className={`${styles.progressStep} ${styles.active}`}>
+            <span>1</span> Station Details
+          </div>
+          <div className={styles.progressStep}>
+            <span>2</span> Station Location
+          </div>
+          <div className={styles.progressStep}>
+            <span>3</span> Location Image
+          </div>
+          <div className={styles.progressStep}>
+            <span>4</span> Completed
+          </div>
+        </div>
+
+        <div className={styles.formSection}>
+          <h2>General Information</h2>
+
+          <div className={styles.formGrid}>
+            <div>
+              <label className={styles.label}>Station Name</label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Enter station name"
+                value={stationName}
+                onChange={(e) => setStationName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className={styles.label}>Capacity</label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="e.g. 8 Powerbanks"
+                value={capacity}
+                onChange={(e) => setCapacity(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className={styles.label}>Location</label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="Enter station location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className={styles.label}>Powerbanks Available</label>
+              <input
+                className={styles.input}
+                type="text"
+                placeholder="e.g. 4 Powerbanks"
+                value={powerbanks}
+                onChange={(e) => setPowerbanks(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className={styles.amenities}>
+            <label className={styles.label}>Nearby Amenities</label>
+            <div className={styles.amenityButtons}>
+              {amenityOptions.map((a) => (
+                <button
+                  key={a.name}
+                  type="button"
+                  className={`${styles.amenityButton} ${
+                    amenities.includes(a.name) ? styles.activeAmenity : ""
+                  }`}
+                  onClick={() => handleAmenityToggle(a.name)}
+                >
+                  {a.icon}
+                  <span>{a.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.actions}>
+            <button className={styles.nextButton} onClick={handleNext}>
+              Next <FiChevronRight />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side Preview */}
+      <div className={styles.preview}>
+        <div className={styles.previewBox}></div>
+        <div className={styles.previewDetails}>
+          <h3>{stationName || "Station Preview"}</h3>
+          <p>{location || "Station location will appear here"}</p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default AddStation;
+export default AddStationPage;
