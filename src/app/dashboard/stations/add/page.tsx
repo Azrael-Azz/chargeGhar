@@ -31,7 +31,7 @@ const AddStationPage: React.FC = () => {
   };
 
   const handleNext = () => {
-    alert("Next Step Clicked ✅");
+    alert("Next Step Clicked");
   };
 
   return (
@@ -110,9 +110,8 @@ const AddStationPage: React.FC = () => {
                 <button
                   key={a.name}
                   type="button"
-                  className={`${styles.amenityButton} ${
-                    amenities.includes(a.name) ? styles.activeAmenity : ""
-                  }`}
+                  className={`${styles.amenityButton} ${amenities.includes(a.name) ? styles.activeAmenity : ""
+                    }`}
                   onClick={() => handleAmenityToggle(a.name)}
                 >
                   {a.icon}

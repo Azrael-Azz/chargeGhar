@@ -25,7 +25,7 @@ const Header: React.FC = () => {
 
     const handleProfileClick = () => {
         setDropdownOpen(false);
-        router.push("/profile");
+        router.push("/dashboard/profile");
     };
 
     const handleLogout = () => {

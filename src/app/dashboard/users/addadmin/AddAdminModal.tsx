@@ -52,17 +52,15 @@ export default function AddAdminModal({ onClose }: { onClose: () => void }) {
           <div className={styles.statusRow}>
             <span>Status</span>
             <div
-              className={`${styles.toggle} ${
-                isActive ? styles.active : ""
-              }`}
+              className={`${styles.toggle} ${isActive ? styles.active : ""
+                }`}
               onClick={() => setIsActive(!isActive)}
             >
               <div className={styles.knob}></div>
             </div>
             <span
-              className={`${styles.statusText} ${
-                isActive ? styles.activeText : ""
-              }`}
+              className={`${styles.statusText} ${isActive ? styles.activeText : ""
+                }`}
             >
               {isActive ? "Active" : "Inactive"}
             </span>
@@ -71,11 +69,11 @@ export default function AddAdminModal({ onClose }: { onClose: () => void }) {
           <div className={styles.access}>
             <span>Access Level</span>
             <div className={styles.accessGrid}>
-              <label><input type="radio" name="access" /> Station</label>
-              <label><input type="radio" name="access" /> Transactions</label>
-              <label><input type="radio" name="access" /> Users</label>
-              <label><input type="radio" name="access" /> Settings</label>
-              <label><input type="radio" name="access" /> Rentals</label>
+              <label><input type="checkbox" name="access" /> Station</label>
+              <label><input type="checkbox" name="access" /> Transactions</label>
+              <label><input type="checkbox" name="access" /> Users</label>
+              <label><input type="checkbox" name="access" /> Settings</label>
+              <label><input type="checkbox" name="access" /> Rentals</label>
             </div>
           </div>
 

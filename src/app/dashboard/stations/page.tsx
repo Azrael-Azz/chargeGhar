@@ -39,11 +39,11 @@ const StationsPage: React.FC = () => {
     };
 
     const handleEdit = (id: number) => {
-        router.push(`/stations/edit/${id}`);
+        router.push("/dashboard/stations/edit/${id}");
     };
 
     const handleAdd = () => {
-        router.push("/stations/add");
+        router.push("/dashboard/stations/add");
     };
 
     return (

@@ -1,9 +1,10 @@
 .container {
-  padding: 2rem;
+  padding: 4rem;
   background-color: #0b0b0b;
   color: #fff;
   min-height: 100vh;
   font-family: "Inter", sans-serif;
+  margin-left: 30px;
 }
 
 .header {
@@ -65,6 +66,12 @@
   font-weight: 500;
   cursor: pointer;
   font-size: 0.95rem;
+}
+
+.sortBtn:hover,
+.exportBtn:hover {
+  color: white;
+  transition: color 0.2s ease;
 }
 
 .icon {

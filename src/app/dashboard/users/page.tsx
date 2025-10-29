@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import styles from "./users.module.css";
-import adminsData from "../../data/admin.json";
-import usersData from "../../data/users.json";
+import adminsData from "../../../data/admin.json";
+import usersData from "../../../data/users.json";
 import { FiShield, FiUsers, FiTrash2, FiFilter } from "react-icons/fi";
-import AddAdminModal from "./AddAdminModal";
+import AddAdminModal from "./addadmin/AddAdminModal";
 
 export default function UsersPage() {
   const [showModal, setShowModal] = useState(false);
