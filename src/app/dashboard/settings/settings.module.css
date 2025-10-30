@@ -1,15 +1,15 @@
-.container {
+.settingsContainer {
     background-color: #0b0b0b;
-    color: white;
+    color: #fff;
+    padding: 3rem 5rem;
     min-height: 100vh;
-    padding: 4rem;
-    margin-left: 30px;
 }
 
 .title {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: 600;
     color: #82ea80;
+    margin-bottom: 2rem;
 }
 
 .subtitle {
@@ -17,11 +17,11 @@
     margin-bottom: 1.5rem;
 }
 
-.card {
-    background: #111;
-    padding: 1.5rem;
+.section {
+    background-color: #111;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
     border-radius: 10px;
-    margin-bottom: 2rem;
 }
 
 .sectionHeader {
@@ -32,28 +32,37 @@
 }
 
 .sectionHeader h2 {
-    color: #82ea80;
     font-size: 1.2rem;
-}
-
-.addBtn {
-    background: #47b216;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
+    color: #82ea80;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-weight: 500;
 }
 
-.addBtn:hover {
-    background: #58cc2a;
+.headerActions {
+    display: flex;
+    gap: 0.8rem;
 }
 
-/* TABLE */
+.addButton {
+    background-color: #47b216;
+    border: none;
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.addButton:hover {
+    background-color: #56d61f;
+}
+
+/* Table Styling */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -61,104 +70,246 @@
 
 .table th,
 .table td {
-    padding: 10px 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #222;
     text-align: left;
 }
 
 .table th {
-    background: #1a1a1a;
-    color: #bbb;
+    color: #aaa;
     text-transform: uppercase;
+    font-size: 0.85rem;
+    background-color: #1a1a1a;
 }
 
 .table tr:nth-child(even) {
-    background: #151515;
+    background-color: #151515;
 }
 
-.toggleBtn {
-    background: none;
-    border: none;
-    cursor: pointer;
+.status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
 }
 
-.active {
-    color: #47b216;
-    font-size: 1.5rem;
-}
-
-.inactive {
-    color: #888;
-    font-size: 1.5rem;
-}
-
-.editBtn,
+/* Buttons */
 .deleteBtn {
-    border: none;
     background: none;
-    color: white;
-    cursor: pointer;
-    font-size: 1.2rem;
-    margin-right: 8px;
-}
-
-.editBtn:hover {
-    color: #47b216;
-}
-
-.deleteBtn:hover {
-    color: #ff4d4d;
-}
-
-/* Profile */
-.profileCard {
-    background: #111;
-    border-radius: 10px;
-    padding: 1.5rem;
-}
-
-.profileGrid {
-    display: flex;
-    justify-content: space-between;
-    gap: 2rem;
-}
-
-.profileInfo {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 1rem;
-    width: 40%;
-}
-
-.profileIcon {
-    font-size: 3rem;
-    color: #47b216;
-    margin-bottom: 0.5rem;
-}
-
-.passwordSection {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 1rem;
-    flex: 1;
-}
-
-.saveBtn {
-    background: #47b216;
     border: none;
-    color: white;
-    padding: 0.4rem 1rem;
-    border-radius: 8px;
     cursor: pointer;
+    margin-right: 6px;
+    color: #82ea80;
+    font-size: 1rem;
+}
+
+.deleteBtn {
+    color: #ff5555;
+}
+
+.profileSection {
+    background-color: #111;
+    padding: 1.5rem;
+    border-radius: 10px;
+}
+
+.profileContainer {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.changePassBtn {
+    background-color: #47b216;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.authSection {
+    margin-top: 1rem;
+    background-color: #1a1a1a;
+    padding: 0.8rem;
+    border-radius: 6px;
+}
+
+/* profile */
+.profileSection {
+    background-color: #111;
+    padding: 2rem;
+    border-radius: 12px;
+    color: #fff;
+}
+
+.profileTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #7df77b;
+    margin-bottom: 1.2rem;
+}
+
+.profileContainer {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Left Card */
+.leftCard {
+    flex: 1;
+    background-color: #151515;
+    padding: 1.5rem;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+.profileTop {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
-.saveBtn:hover {
-    background: #58cc2a;
+.avatar {
+    background-color: #0b0b0b;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toggleContainer {
+.profileIcon {
+    font-size: 2rem;
+    color: #47b216;
+}
+
+.profileHeader h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.editProfileBtn {
+    background-color: #47b216;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.editProfileBtn:hover {
+    background-color: #58d61f;
+}
+
+.profileDetails {
+    background-color: #0b0b0b;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.profileRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #222;
     color: #ccc;
+}
+
+.profileRow:last-child {
+    border-bottom: none;
+}
+
+.inlineEdit {
+    background: none;
+    border: none;
+    color: #47b216;
+    cursor: pointer;
+}
+
+/* Right Card */
+.rightCard {
+    flex: 1;
+    background-color: #151515;
+    padding: 1.5rem;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+.authTitle {
+    font-size: 1.1rem;
+    color: #7df77b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 1rem;
+}
+
+.changePassBtn {
+    background-color: #47b216;
+    color: white;
+    border: none;
+    padding: 0.6rem;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.changePassBtn:hover {
+    background-color: #56d61f;
+}
+
+.authBox {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.authBox h4 {
+    color: #82ea80;
+    margin-bottom: 6px;
+}
+
+.authBox p {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.bold {
+    color: #fff;
+    font-weight: 600;
+}
+
+.deactivate {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 70px;
+}
+
+.active {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(71, 178, 22, 0.2);
+    color: #7df77b;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 70px;
 }

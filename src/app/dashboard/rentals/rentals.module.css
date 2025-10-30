@@ -13,8 +13,9 @@
 
 .title {
   font-size: 2rem;
-  color: #43ff64;
   font-weight: 600;
+  color: #82ea80;
+  margin-bottom: 2rem;
 }
 
 .subtitle {

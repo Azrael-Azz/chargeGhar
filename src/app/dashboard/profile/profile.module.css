@@ -1,0 +1,144 @@
+.container {
+    padding: 4rem;
+    background-color: #0b0b0b;
+    color: #fff;
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+    margin-left: 30px;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #82ea80;
+    margin-bottom: 2rem;
+}
+
+.pageSubtitle {
+    color: #bbb;
+    margin-bottom: 1.5rem;
+}
+
+/* Header */
+.profileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    background-color: #111;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    background-color: #0b0b0b;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatarIcon {
+    font-size: 3rem;
+    color: #47b216;
+}
+
+.profileNameCard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.profileName {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.profileRole {
+    color: #aaa;
+    font-size: 0.9rem;
+}
+
+/* Content Layout */
+.profileContent {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    background-color: #151515;
+    border-radius: 10px;
+    padding: 1.5rem;
+    min-width: 300px;
+}
+
+.cardTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #7df77b;
+    margin-bottom: 1rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.formGroup label {
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+}
+
+.formGroup input {
+    background-color: #0b0b0b;
+    border: 1px solid #2a2a2a;
+    border-radius: 6px;
+    color: white;
+    padding: 0.6rem;
+    outline: none;
+}
+
+.formGroup input:focus {
+    border-color: #47b216;
+}
+
+/* Unsaved Changes Bar */
+.unsavedChanges {
+    background-color: #151515;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    border: 1px solid #333;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.cancelBtn {
+    background: none;
+    color: #f33;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.confirmBtn {
+    background: none;
+    color: #47b216;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+}

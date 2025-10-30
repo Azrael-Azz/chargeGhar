@@ -2,86 +2,53 @@
 
 import React, { useState } from "react";
 import styles from "./settings.module.css";
-import { FiEdit, FiTrash2, FiPlus, FiToggleLeft, FiToggleRight, FiUser } from "react-icons/fi";
-import { useRouter } from "next/navigation";
+import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
 
-interface Package {
-    id: number;
-    name: string;
-    type: string;
-    duration: string;
-    price: string;
-    active: boolean;
-}
-
-interface Coupon {
-    id: number;
-    name: string;
-    discount: string;
-    expiry: string;
-    status: boolean;
-}
-
-const SettingsPage = () => {
-    const router = useRouter();
-
-    const [packages, setPackages] = useState<Package[]>([
-        { id: 1, name: "Package A", type: "Hourly", duration: "1h", price: "Rs 50", active: true },
-        { id: 2, name: "Package B", type: "Daily", duration: "24h", price: "Rs 250", active: false },
+export default function SettingsPage() {
+    const [packages] = useState([
+        { id: 1, name: "1 Hour Package", duration: "1 Hour", price: "₹100", active: true },
+        { id: 2, name: "1 Day Package", duration: "1 Day", price: "₹500", active: false },
     ]);
 
-    const [coupons, setCoupons] = useState<Coupon[]>([
-        { id: 1, name: "SAVE10", discount: "10%", expiry: "2025-12-01", status: true },
-        { id: 2, name: "OFFER20", discount: "20%", expiry: "2025-11-15", status: false },
+    const [coupons] = useState([
+        { id: 1, code: "SAVE10", discount: "10%", status: "Active" },
+        { id: 2, code: "FREEDAY", discount: "100%", status: "Expired" },
     ]);
 
-    const togglePackage = (id: number) => {
-        setPackages((prev) =>
-            prev.map((pkg) => (pkg.id === id ? { ...pkg, active: !pkg.active } : pkg))
-        );
-    };
+    const [achievements] = useState([
+        { id: 1, name: "Make First Purchase", points: 100, difficulty: "Easy", active: true },
+    ]);
 
-    const toggleCoupon = (id: number) => {
-        setCoupons((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, status: !c.status } : c))
-        );
-    };
+    const [admin, setAdmin] = useState({
+        userId: "A1029",
+        name: "Admin User",
+        email: "mah******60@gmail.com",
+        phone: "98******51",
+    });
 
-    const handleDelete = (id: number, type: string) => {
-        if (confirm(`Delete this ${type}?`)) {
-            if (type === "package") setPackages((p) => p.filter((x) => x.id !== id));
-            else setCoupons((c) => c.filter((x) => x.id !== id));
+    const handleEdit = (field: keyof typeof admin) => {
+        const newValue = prompt(`Enter new ${field}:`, admin[field]);
+        if (newValue) {
+            setAdmin({ ...admin, [field]: newValue });
         }
     };
 
-    const handleAdd = (type: string) => {
-        router.push(`/dashboard/settings/add-${type}`);
-    };
-
-    const handleEdit = (type: string, id: number) => {
-        router.push(`/dashboard/settings/edit-${type}/${id}`);
-    };
-
     return (
-        <div className={styles.container}>
+        <div className={styles.settingsContainer}>
             <h1 className={styles.title}>Settings</h1>
             <p className={styles.subtitle}>Manage system configurations</p>
 
-            {/* PACKAGES */}
-            <section className={styles.card}>
+            {/* PACKAGES SECTION */}
+            <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2>Packages</h2>
-                    <button className={styles.addBtn} onClick={() => handleAdd("package")}>
-                        <FiPlus /> Add Package
-                    </button>
+                    <button className={styles.addButton}><FiPlus /> Add Package</button>
                 </div>
-
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Package ID</th>
                             <th>Package Name</th>
-                            <th>Type</th>
                             <th>Duration</th>
                             <th>Price</th>
                             <th>Status</th>
@@ -93,24 +60,16 @@ const SettingsPage = () => {
                             <tr key={pkg.id}>
                                 <td>{pkg.id}</td>
                                 <td>{pkg.name}</td>
-                                <td>{pkg.type}</td>
                                 <td>{pkg.duration}</td>
                                 <td>{pkg.price}</td>
                                 <td>
-                                    <button
-                                        className={styles.toggleBtn}
-                                        onClick={() => togglePackage(pkg.id)}
-                                    >
-                                        {pkg.active ? <FiToggleRight className={styles.active} /> : <FiToggleLeft className={styles.inactive} />}
-                                    </button>
+                                    <span className={`${styles.status} ${pkg.active ? styles.active : styles.inactive}`}>
+                                        {pkg.active ? "Active" : "Inactive"}
+                                    </span>
                                 </td>
                                 <td>
-                                    <button className={styles.editBtn} onClick={() => handleEdit("package", pkg.id)}>
-                                        <FiEdit />
-                                    </button>
-                                    <button className={styles.deleteBtn} onClick={() => handleDelete(pkg.id, "package")}>
-                                        <FiTrash2 />
-                                    </button>
+                                    <button className={styles.editBtn}><FiEdit /></button>
+                                    <button className={styles.deleteBtn}><FiTrash2 /></button>
                                 </td>
                             </tr>
                         ))}
@@ -118,48 +77,32 @@ const SettingsPage = () => {
                 </table>
             </section>
 
-            {/* COUPONS */}
-            <section className={styles.card}>
+            {/* COUPONS SECTION */}
+            <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2>Coupons</h2>
-                    <button className={styles.addBtn} onClick={() => handleAdd("coupon")}>
-                        <FiPlus /> Add Coupon
-                    </button>
+                    <button className={styles.addButton}><FiPlus /> Add Coupon</button>
                 </div>
-
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Coupon Name</th>
+                            <th>Coupon ID</th>
+                            <th>Coupon Code</th>
                             <th>Discount</th>
-                            <th>Expiry</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {coupons.map((coupon) => (
-                            <tr key={coupon.id}>
-                                <td>{coupon.id}</td>
-                                <td>{coupon.name}</td>
-                                <td>{coupon.discount}</td>
-                                <td>{coupon.expiry}</td>
+                        {coupons.map((c) => (
+                            <tr key={c.id}>
+                                <td>{c.id}</td>
+                                <td>{c.code}</td>
+                                <td>{c.discount}</td>
+                                <td><span className={`${styles.status} ${c.status === "Active" ? styles.active : styles.inactive}`}>{c.status}</span></td>
                                 <td>
-                                    <button
-                                        className={styles.toggleBtn}
-                                        onClick={() => toggleCoupon(coupon.id)}
-                                    >
-                                        {coupon.status ? <FiToggleRight className={styles.active} /> : <FiToggleLeft className={styles.inactive} />}
-                                    </button>
-                                </td>
-                                <td>
-                                    <button className={styles.editBtn} onClick={() => handleEdit("coupon", coupon.id)}>
-                                        <FiEdit />
-                                    </button>
-                                    <button className={styles.deleteBtn} onClick={() => handleDelete(coupon.id, "coupon")}>
-                                        <FiTrash2 />
-                                    </button>
+                                    <button className={styles.editBtn}><FiEdit /></button>
+                                    <button className={styles.deleteBtn}><FiTrash2 /></button>
                                 </td>
                             </tr>
                         ))}
@@ -167,33 +110,136 @@ const SettingsPage = () => {
                 </table>
             </section>
 
-            {/* ADMIN PROFILE */}
-            <section className={styles.profileCard}>
-                <h2>Admin Profile Update</h2>
-                <div className={styles.profileGrid}>
-                    <div className={styles.profileInfo}>
-                        <FiUser className={styles.profileIcon} />
-                        <p><strong>Name:</strong> Admin</p>
-                        <p><strong>Email:</strong> admin@chargeghar.com</p>
-                        <p><strong>Role:</strong> Super Admin</p>
-                        <button className={styles.editBtn}>Edit Profile</button>
+            {/* ACHIEVEMENTS SECTION */}
+            <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2>Achievements and Points Assignment</h2>
+                    <div className={styles.headerActions}>
+                        <button className={styles.addButton}><FiPlus /> Assign Points</button>
+                        <button className={styles.addButton}><FiPlus /> Add Achievement</button>
                     </div>
+                </div>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>Achievement ID</th>
+                            <th>Achievement Name</th>
+                            <th>Points Assigned</th>
+                            <th>Difficulty</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {achievements.map((a) => (
+                            <tr key={a.id}>
+                                <td>{a.id}</td>
+                                <td>{a.name}</td>
+                                <td>{a.points} pts</td>
+                                <td>{a.difficulty}</td>
+                                <td><span className={`${styles.status} ${a.active ? styles.active : styles.inactive}`}>{a.active ? "Active" : "Inactive"}</span></td>
+                                <td>
+                                    <button className={styles.editBtn}><FiEdit /></button>
+                                    <button className={styles.deleteBtn}><FiTrash2 /></button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </section>
 
-                    <div className={styles.passwordSection}>
-                        <h3>Password and Notifications</h3>
-                        <button className={styles.saveBtn}>Change Password</button>
+            {/* ADMIN PROFILE UPDATE */}
+            <section className={styles.profileSection}>
+                <h2>Admin Profile Update</h2>
+                <div className={styles.profileSection}>
+                    <h2 className={styles.profileTitle}>Admin Profile Update</h2>
 
-                        <div className={styles.toggleContainer}>
-                            <label>Email Notifications</label>
-                            <button className={styles.toggleBtn}>
-                                <FiToggleRight className={styles.active} />
-                            </button>
+                    <div className={styles.profileContainer}>
+                        {/* Left Card */}
+                        <div className={styles.leftCard}>
+                            <div className={styles.profileTop}>
+                                <div className={styles.avatar}>
+                                    <FiUser className={styles.profileIcon} />
+                                </div>
+                                <div className={styles.profileHeader}>
+                                    <h3>{admin.name}</h3>
+                                    <button className={styles.editProfileBtn}>
+                                        <FiEdit /> Edit Profile
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className={styles.profileDetails}>
+                                <div className={styles.profileRow}>
+                                    <span>User ID:</span>
+                                    <span>{admin.userId}</span>
+                                </div>
+
+                                <div className={styles.profileRow}>
+                                    <span>Username:</span>
+                                    <span>{admin.name}</span>
+                                    <button className={styles.inlineEdit} onClick={() => handleEdit("name")}>
+                                        <FiEdit />
+                                    </button>
+                                </div>
+
+                                <div className={styles.profileRow}>
+                                    <span>Email:</span>
+                                    <span>{admin.email}</span>
+                                    <button className={styles.inlineEdit} onClick={() => handleEdit("email")}>
+                                        <FiEdit />
+                                    </button>
+                                </div>
+
+                                <div className={styles.profileRow}>
+                                    <span>Phone:</span>
+                                    <span>{admin.phone}</span>
+                                    <button className={styles.inlineEdit} onClick={() => handleEdit("phone")}>
+                                        <FiEdit />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Card */}
+                        <div className={styles.rightCard}>
+                            <h3 className={styles.authTitle}>
+                                <FiLock /> Password and Authentication
+                            </h3>
+
+                            <button className={styles.changePassBtn}>Change Password</button>
+
+                            <div className={styles.authBox}>
+                                <h4>Email Authentication</h4>
+                                <p>
+                                    Verify your authentication using Gmail. Your current email account
+                                    is: <span className={styles.bold}>{admin.email}</span>
+                                </p>
+
+                                <div className={styles.active}>
+                                    <label>
+                                        <input type="button" name="emailAuth" defaultChecked /> Active Authentication
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className={styles.authBox}>
+                                <h4>SMS Authentication</h4>
+                                <p>
+                                    Verify using SMS sent to your phone number. Your current phone
+                                    number is: <span className={styles.bold}>{admin.phone}</span>
+                                </p>
+
+                                <div className={styles.deactivate}>
+                                    <label>
+                                        <input type="button" name="smsAuth" defaultChecked /> Deactivate SMS Authentication
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </div>
     );
-};
-
-export default SettingsPage;
+}

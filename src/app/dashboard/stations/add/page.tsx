@@ -2,12 +2,11 @@
 
 import React, { useState } from "react";
 import styles from "./add.module.css";
-import { useRouter } from "next/navigation";
 import { FaCoffee, FaRestroom, FaStore, FaParking, FaCouch } from "react-icons/fa";
 import { FiChevronRight } from "react-icons/fi";
 
 const AddStationPage: React.FC = () => {
-  const router = useRouter();
+
   const [stationName, setStationName] = useState("");
   const [capacity, setCapacity] = useState("");
   const [location, setLocation] = useState("");

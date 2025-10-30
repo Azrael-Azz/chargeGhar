@@ -1,4 +1,4 @@
-/* 🌑 Overall container */
+/* container */
 .container {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -235,6 +235,7 @@
   flex-direction: column;
   gap: 0.75rem;
   box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  margin-top: 5.3rem;
 }
 
 .previewHeader {
@@ -253,7 +254,7 @@
 }
 
 .previewDetails {
-  margin-top: auto;
+  margin-top: 10px;
 }
 
 .previewDetails h3 {

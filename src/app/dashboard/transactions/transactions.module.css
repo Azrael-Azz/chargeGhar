@@ -8,8 +8,10 @@
 }
 
 .title {
-    font-size: 1.8rem;
-    color: rgb(21, 192, 21);
+    font-size: 2rem;
+    font-weight: 600;
+    color: #82ea80;
+    margin-bottom: 2rem;
 }
 
 .subtitle {

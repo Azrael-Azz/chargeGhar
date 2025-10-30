@@ -13,8 +13,9 @@
 
 .title {
   font-size: 2rem;
-  color: #32cd32;
   font-weight: 600;
+  color: #82ea80;
+  margin-bottom: 2rem;
 }
 
 .subtitle {
@@ -121,6 +122,7 @@
   color: #ccc;
   font-size: 0.9rem;
   cursor: pointer;
+
 }
 
 .icon {
