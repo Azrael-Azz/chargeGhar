@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import styles from "./users.module.css";
 import adminsData from "../../../data/admin.json";
 import usersData from "../../../data/users.json";
-import { FiShield, FiUsers, FiTrash2, FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
+import { FiShield, FiUsers, FiTrash2, FiFilter } from "react-icons/fi";
 import AddAdminModal from "./addadmin/AddAdminModal";
 
 interface User {
