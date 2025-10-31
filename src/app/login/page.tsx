@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import type { FormEvent } from "react";
 import styles from "./login.module.css";
 import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import api from "../../lib/axios"; // import the Axios instance
+
 
 const Login: React.FC = () => {
     const router = useRouter();
@@ -15,26 +16,30 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleLogin = async () => {
         setLoading(true);
         setError(null);
 
         try {
-            // Example placeholder for API call
-            if (email !== "admin@example.com" || password !== "1234") {
-                throw new Error("Invalid credentials");
+            // Use axios instance
+            const res = await api.post("/admin/login", { email, password });
+
+            // Assuming Django returns tokens (adjust to your backend)
+            const { access, refresh } = res.data?.data || {};
+            if (access) {
+                localStorage.setItem("access_token", access);
+                localStorage.setItem("refresh_token", refresh);
             }
 
-            console.log("Logged in successfully!");
             router.push("/dashboard");
-        } catch {
+        } catch (err: any) {
+            console.error("Login error:", err);
             setError("Invalid email or password");
         } finally {
             setLoading(false);
         }
     };
-    console.log("Image path:", "/ChargeCharLogo.png");
+
     return (
         <div className={styles.loginPage}>
             {/* Left Section */}
@@ -55,7 +60,7 @@ const Login: React.FC = () => {
 
             {/* Right Section */}
             <div className={styles.loginRight}>
-                <form className={styles.loginBox} onSubmit={handleSubmit}>
+                <form className={styles.loginBox} onSubmit={handleLogin}>
                     <h2>
                         Welcome, <span>Admin</span>
                     </h2>
