@@ -1,21 +1,57 @@
-import axios from "axios";
+import axios from 'axios';
 
-// Create axios instance
-const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000", // Django base URL
-    withCredentials: true, // allows sending cookies if you use session auth
-    headers: {
-        "Content-Type": "application/json",
-    },
+const instance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8010/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Optionally attach token automatically if using JWT
-api.interceptors.request.use((config) => {
-    if (typeof window !== "undefined") {
-        const token = localStorage.getItem("access_token");
-        if (token) config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor to add the auth token to headers
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-});
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-export default api;
+// Response interceptor to handle token refresh
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const { data } = await axios.post('/api/refresh');
+        const { accessToken } = data;
+
+        localStorage.setItem('token', accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed, logging out:", refreshError);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default instance;

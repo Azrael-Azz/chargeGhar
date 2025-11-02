@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FiBell, FiUser, FiLogOut, FiSettings } from "react-icons/fi";
 import logo from "../../../public/ChargeGharLogo.png";
+import axios from "@/lib/axios";
 
 const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,11 +29,22 @@ const Header: React.FC = () => {
         router.push("/dashboard/profile");
     };
 
-    const handleLogout = () => {
-        // Placeholder for actual logout logic
-        localStorage.removeItem("authToken"); // example cleanup
-        setDropdownOpen(false);
-        router.push("/login");
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("/api/logout", { method: "POST" });
+
+            if (!response.ok) {
+                throw new Error("Logout request failed");
+            }
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("refresh_token");
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            setDropdownOpen(false);
+        }
     };
 
     return (
