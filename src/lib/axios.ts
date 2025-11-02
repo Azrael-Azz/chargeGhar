@@ -1,0 +1,57 @@
+import axios from 'axios';
+
+const instance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8010/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor to add the auth token to headers
+instance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle token refresh
+instance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const { data } = await axios.post('/api/refresh');
+        const { accessToken } = data;
+
+        localStorage.setItem('token', accessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed, logging out:", refreshError);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default instance;
