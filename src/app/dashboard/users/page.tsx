@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import styles from "./users.module.css";
+
 import adminsData from "../../../Data/admin.json";
 import usersData from "../../../Data/users.json";
 import { FiShield, FiUsers, FiTrash2, FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
@@ -34,6 +35,8 @@ export default function UsersPage() {
     { key: "rentals", label: "Rentals" },
     { key: "createdAt", label: "Created Date" },
   ];
+
+
 
   const handleSortSelect = (key: SortKey) => {
     if (sortKey === key) {
@@ -176,7 +179,7 @@ export default function UsersPage() {
           >
             <FiFilter className={styles.icon} />
             Sort By
-            <FiChevronDown style={{ fontSize: "0.8rem" }} />
+            <FiSearch style={{ fontSize: "0.8rem" }} />
           </button>
 
           {/* SORT OPTIONS – ONLY TEXT HOVERS GREEN */}
