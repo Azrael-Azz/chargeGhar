@@ -6,6 +6,13 @@ import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+};
+
 const Login: React.FC = () => {
   const router = useRouter();
 
@@ -21,7 +28,16 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post("/api/login", { email, password });
+      const csrfToken = getCookie('csrftoken');
+      const response = await axios.post(
+        "/api/login",
+        { email, password },
+        {
+          headers: {
+            'X-CSRFTOKEN': csrfToken,
+          },
+        }
+      );
       console.log(response.data);
 
       if (response.data.data.access_token) {

@@ -1,6 +1,8 @@
 // src/app/dashboard/layout.tsx
 "use client";
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar/Navbar";
 import Header from "@/components/Header/Header";
 import styles from "./dashboard.module.css";
@@ -10,6 +12,41 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            router.push('/login');
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const isExpired = payload.exp * 1000 < Date.now();
+
+            if (isExpired) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('refresh_token');
+                router.push('/login');
+            } else {
+                setIsAuthenticated(true);
+            }
+        } catch (error) {
+            console.error('Invalid token:', error);
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+            router.push('/login');
+        }
+    }, [router]);
+
+    if (!isAuthenticated) {
+        // You can render a loading spinner here while checking auth
+        return null;
+    }
+
     return (
         <div className={styles.layout}>
             <Navbar />
