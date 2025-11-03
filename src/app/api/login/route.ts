@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     );
 
     const data = response.data;
+    console.log(data)
 
     if (data.data?.access_token) {
       return NextResponse.json(data);

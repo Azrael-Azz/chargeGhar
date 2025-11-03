@@ -16,7 +16,7 @@ export default function DashboardLayout({
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
             router.push('/login');
@@ -28,16 +28,16 @@ export default function DashboardLayout({
             const isExpired = payload.exp * 1000 < Date.now();
 
             if (isExpired) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
                 router.push('/login');
             } else {
                 setIsAuthenticated(true);
             }
         } catch (error) {
             console.error('Invalid token:', error);
-            localStorage.removeItem('token');
-            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             router.push('/login');
         }
     }, [router]);
