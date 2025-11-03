@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import styles from "./users.module.css";
 import adminsData from "../../../data/admin.json";
 import usersData from "../../../data/users.json";
-import { FiShield, FiUsers, FiTrash2, FiFilter } from "react-icons/fi";
+import { FiShield, FiUsers, FiTrash2, FiFilter, FiSearch } from "react-icons/fi";
 import AddAdminModal from "./addadmin/AddAdminModal";
 
 interface User {
@@ -34,6 +34,8 @@ export default function UsersPage() {
     { key: "rentals", label: "Rentals" },
     { key: "createdAt", label: "Created Date" },
   ];
+
+
 
   const handleSortSelect = (key: SortKey) => {
     if (sortKey === key) {
@@ -176,7 +178,7 @@ export default function UsersPage() {
           >
             <FiFilter className={styles.icon} />
             Sort By
-            <FiChevronDown style={{ fontSize: "0.8rem" }} />
+            <FiSearch style={{ fontSize: "0.8rem" }} />
           </button>
 
           {/* SORT OPTIONS – ONLY TEXT HOVERS GREEN */}

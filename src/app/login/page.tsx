@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { ButtonHTMLAttributes, FormEvent, useState } from "react";
 import styles from "./login.module.css";
 import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
-import api from "../../lib/axios"; // import the Axios instance
-
+import axios from "axios";
 
 const Login: React.FC = () => {
     const router = useRouter();
@@ -16,22 +15,27 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
+    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setLoading(true);
         setError(null);
-
+        const data = {
+            "email": email,
+            "password": password
+        }
         try {
-            // Use axios instance
-            const res = await api.post("/admin/login", { email, password });
+            // axios instance
+            const response = await axios.post("http://localhost:8010/api/admin/login", data, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
 
-            // Assuming Django returns tokens (adjust to your backend)
-            const { access, refresh } = res.data?.data || {};
-            if (access) {
-                localStorage.setItem("access_token", access);
-                localStorage.setItem("refresh_token", refresh);
+            if (response.data.success) {
+                router.push("/dashboard");
+
             }
 
-            router.push("/dashboard");
         } catch (err: any) {
             console.error("Login error:", err);
             setError("Invalid email or password");
