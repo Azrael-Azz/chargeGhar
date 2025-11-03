@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
+import React, { useState, FormEvent } from "react";
 import styles from "./login.module.css";
 import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
@@ -21,17 +21,14 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post(
-        "/api/login",
-        { email, password }
-      );
+      const response = await axios.post("/api/login", { email, password });
       console.log(response.data);
 
       if (response.data.data.access_token) {
-        localStorage.setItem('token', response.data.data.access_token);
+        localStorage.setItem("token", response.data.data.access_token);
       }
       if (response.data.data.refresh_token) {
-        localStorage.setItem('refresh_token', response.data.data.refresh_token);
+        localStorage.setItem("refresh_token", response.data.data.refresh_token);
       }
 
       console.log("Logged in successfully!");
@@ -43,6 +40,7 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className={styles.loginPage}>
       {/* Left Section */}
