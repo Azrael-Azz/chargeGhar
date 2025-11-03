@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { AxiosError } from 'axios';
+import FormData from 'form-data';
 
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
+    const csrfToken = req.headers.get('X-CSRFTOKEN') || '';
 
     if (!email || !password) {
       return NextResponse.json(
@@ -13,31 +15,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('password', password);
+
     const response = await axios.post(
-      'http://api/api/admin/login/', // Docker service name
-      {email:email, password:password},
-      { headers: { 'Content-Type': 'application/json' } }
+      'https://main.chargeghar.com/api/admin/login',
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+          'X-CSRFTOKEN': csrfToken,
+        },
+      }
     );
+
     const data = response.data;
 
     if (data.data?.access_token) {
-      const responseWithCookie = NextResponse.json(data);
-      responseWithCookie.cookies.set('token', data.data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7, // 1 week
-        path: '/',
-      });
-
-      if (data.data?.refresh_token) {
-        responseWithCookie.cookies.set('refresh_token', data.data.refresh_token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-          path: '/',
-        });
-      }
-      return responseWithCookie;
+      return NextResponse.json(data);
     } else {
       return NextResponse.json({ message: 'Access token not found' }, { status: 401 });
     }
