@@ -1,3 +1,7 @@
+// Note:// jwt screct is used beacuse in middleware or proxy it again valid validate the token using jwt serect ad backend do
+
+
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import * as jose from 'jose';
