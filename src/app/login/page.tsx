@@ -1,21 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import styles from "./login.module.css";
 import { FiEye, FiEyeOff, FiLock, FiLoader } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import instance from "@/lib/axios";
 
 const Login: React.FC = () => {
   const router = useRouter();
-  const router = useRouter();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,19 +21,16 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.post(
-        "/api/login",
-        { email, password }
-      );
+      const response = await axios.post("/api/login", { email, password });
       console.log(response.data);
 
       if (response.data.data.access_token) {
-        localStorage.setItem('token', response.data.data.access_token);
+        localStorage.setItem("token", response.data.data.access_token);
       }
       if (response.data.data.refresh_token) {
-        localStorage.setItem('refresh_token', response.data.data.refresh_token);
+        localStorage.setItem("refresh_token", response.data.data.refresh_token);
       }
-      
+
       console.log("Logged in successfully!");
       router.push("/dashboard");
     } catch (error: any) {
@@ -50,6 +40,7 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
   return (
     <div className={styles.loginPage}>
       {/* Left Section */}
@@ -83,37 +74,7 @@ const Login: React.FC = () => {
             className={error ? styles.error : ""}
             required
           />
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={error ? styles.error : ""}
-            required
-          />
 
-          <label htmlFor="password">Password</label>
-          <div className={styles.passwordInput}>
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={error ? styles.error : ""}
-              required
-            />
-            <button
-              type="button"
-              className={styles.togglePassword}
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <FiEyeOff /> : <FiEye />}
-            </button>
-          </div>
           <label htmlFor="password">Password</label>
           <div className={styles.passwordInput}>
             <input
@@ -136,23 +97,7 @@ const Login: React.FC = () => {
           </div>
 
           {error && <p className={styles.errorText}>{error}</p>}
-          {error && <p className={styles.errorText}>{error}</p>}
 
-          <button type="submit" disabled={loading}>
-            {loading ? (
-              <>
-                <FiLoader className={styles.spin} /> Logging in...
-              </>
-            ) : (
-              <>
-                <FiLock /> Login
-              </>
-            )}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
           <button type="submit" disabled={loading}>
             {loading ? (
               <>
