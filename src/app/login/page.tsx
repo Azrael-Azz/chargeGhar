@@ -38,13 +38,11 @@ const Login: React.FC = () => {
           },
         }
       );
-      console.log(response.data);
-
       if (response.data.data.access_token) {
-        localStorage.setItem("token", response.data.data.access_token);
+        localStorage.setItem("accessToken", response.data.data.access_token);
       }
       if (response.data.data.refresh_token) {
-        localStorage.setItem("refresh_token", response.data.data.refresh_token);
+        localStorage.setItem("refreshToken", response.data.data.refresh_token);
       }
 
       console.log("Logged in successfully!");

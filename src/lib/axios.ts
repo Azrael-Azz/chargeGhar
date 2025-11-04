@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8010/api',
+  baseURL: '',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,7 +10,7 @@ const instance = axios.create({
 // Request interceptor to add the auth token to headers
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -20,6 +20,15 @@ instance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Function to get CSRF token from cookies
+const getCsrfToken = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const csrfCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('csrftoken='));
+  return csrfCookie ? csrfCookie.split('=')[1] : null;
+};
 
 // Response interceptor to handle token refresh
 instance.interceptors.response.use(
@@ -31,18 +40,28 @@ instance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const { data } = await axios.post('/api/refresh');
+        const refreshToken = localStorage.getItem('refreshToken');
+        const csrfToken = getCsrfToken();
+
+        const { data } = await axios.post('/api/refresh', 
+          { refresh: refreshToken },
+          {
+            headers: {
+              'X-CSRFTOKEN': csrfToken,
+            },
+          }
+        );
         const { accessToken } = data;
 
-        localStorage.setItem('token', accessToken);
+        localStorage.setItem('accessToken', accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
         return instance(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed, logging out:", refreshError);
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         if (typeof window !== 'undefined') {
           window.location.href = '/login';
         }

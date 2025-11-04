@@ -9,17 +9,32 @@ import {
     Tooltip,
     Legend,
 } from "recharts";
-
-const data = [
-    { name: "City Mall", value: 40 },
-    { name: "Airport", value: 30 },
-    { name: "Downtown", value: 20 },
-    { name: "University", value: 10 },
-];
+import { useDashboardData } from "../contexts/DashboardDataContext";
 
 const COLORS = ["#47b216", "#82ea80", "#66bb6a", "#3c8c3c"];
 
 const StationUtilizationChart: React.FC = () => {
+    const { dashboardData, loading, error } = useDashboardData();
+
+    if (loading) {
+        return <div>Loading Station Utilization...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading Station Utilization: {error}</div>;
+    }
+
+    const stations = dashboardData?.stations?.results || [];
+
+    const chartData = stations.map((station: any) => {
+        const utilizedSlots = station.total_slots - station.available_slots;
+        const utilizationPercentage = station.total_slots > 0 ? (utilizedSlots / station.total_slots) * 100 : 0;
+        return {
+            name: station.station_name,
+            value: parseFloat(utilizationPercentage.toFixed(2)),
+        };
+    });
+
     return (
         <div
             style={{
@@ -35,7 +50,7 @@ const StationUtilizationChart: React.FC = () => {
             <ResponsiveContainer>
                 <PieChart>
                     <Pie
-                        data={data}
+                        data={chartData}
                         cx="50%"
                         cy="50%"
                         outerRadius={100}
@@ -43,7 +58,7 @@ const StationUtilizationChart: React.FC = () => {
                         dataKey="value"
                         label
                     >
-                        {data.map((entry, index) => (
+                        {chartData.map((entry: number, index: number) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>

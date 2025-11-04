@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     formData.append('password', password);
 
     const response = await axios.post(
-      'https://main.chargeghar.com/api/admin/login',
+      `${process.env.BASE_URL}/admin/login`,
       formData,
       {
         headers: {
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     );
 
     const data = response.data;
+    console.log(data)
 
     if (data.data?.access_token) {
       return NextResponse.json(data);

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar/Navbar";
 import Header from "@/components/Header/Header";
 import styles from "./dashboard.module.css";
+import { DashboardDataProvider } from '../../contexts/DashboardDataContext';
 
 export default function DashboardLayout({
     children,
@@ -16,7 +17,7 @@ export default function DashboardLayout({
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
 
         if (!token) {
             router.push('/login');
@@ -28,16 +29,16 @@ export default function DashboardLayout({
             const isExpired = payload.exp * 1000 < Date.now();
 
             if (isExpired) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
                 router.push('/login');
             } else {
                 setIsAuthenticated(true);
             }
         } catch (error) {
             console.error('Invalid token:', error);
-            localStorage.removeItem('token');
-            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             router.push('/login');
         }
     }, [router]);
@@ -48,12 +49,14 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className={styles.layout}>
-            <Navbar />
-            <div className={styles.main}>
-                <Header />
-                <main className={styles.content}>{children}</main>
+        <DashboardDataProvider>
+            <div className={styles.layout}>
+                <Navbar />
+                <div className={styles.main}>
+                    <Header />
+                    <main className={styles.content}>{children}</main>
+                </div>
             </div>
-        </div>
+        </DashboardDataProvider>
     );
 }

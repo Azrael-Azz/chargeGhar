@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {
     LineChart,
@@ -10,23 +8,24 @@ import {
     ResponsiveContainer,
     CartesianGrid,
 } from "recharts";
-
-const data = [
-    { month: "Jan", revenue: 4000 },
-    { month: "Feb", revenue: 5200 },
-    { month: "Mar", revenue: 4800 },
-    { month: "Apr", revenue: 6000 },
-    { month: "May", revenue: 7100 },
-    { month: "Jun", revenue: 6600 },
-    { month: "Jul", revenue: 4000 },
-    { month: "Aug", revenue: 5200 },
-    { month: "Sep", revenue: 4800 },
-    { month: "Oct", revenue: 6000 },
-    { month: "Nov", revenue: 7100 },
-    { month: "Dec", revenue: 6600 },
-];
+import { useDashboardData } from "../contexts/DashboardDataContext";
 
 const RevenueChart: React.FC = () => {
+    const { dashboardData, loading, error } = useDashboardData();
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>{error}</div>;
+    }
+
+    const revenueThisMonth = dashboardData?.dashboard?.revenue_this_month || 0;
+    const data = [
+        { month: "This Month", revenue: revenueThisMonth },
+    ];
+
     return (
         <div
             style={{

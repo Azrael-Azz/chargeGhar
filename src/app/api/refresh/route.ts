@@ -2,15 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 
 export async function POST(req: NextRequest) {
-  const refreshToken = req.cookies.get('refresh_token')?.value;
+  const { refresh: refreshToken } = await req.json();
+  const csrfToken = req.headers.get('X-CSRFTOKEN');
 
   if (!refreshToken) {
     return NextResponse.json({ message: 'Refresh token not found' }, { status: 401 });
   }
 
+  if (!csrfToken) {
+    return NextResponse.json({ message: 'CSRF token not found' }, { status: 401 });
+  }
+
   try {
-    const response = await axios.post('http://api/auth/refresh', {
-      refresh: refreshToken,
+    const formData = new FormData();
+    formData.append('refresh', refreshToken);
+
+    const response = await axios.post(`${process.env.BASE_URL}/auth/refresh`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'X-CSRFTOKEN': csrfToken,
+      },
     });
 
     const { access: newAccessToken } = response.data;
@@ -19,23 +30,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'New access token not found in response' }, { status: 500 });
     }
 
-    const clientResponse = NextResponse.json({ accessToken: newAccessToken });
-
-    clientResponse.cookies.set('token', newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week, or match your backend's token lifetime
-      path: '/',
-    });
-
-    return clientResponse;
+    return NextResponse.json({ accessToken: newAccessToken });
 
   } catch (error) {
     console.error('Token refresh error:', error);
-
-    const response = NextResponse.json({ message: 'Invalid refresh token' }, { status: 401 });
-    response.cookies.set('token', '', { maxAge: -1, path: '/' });
-    response.cookies.set('refresh_token', '', { maxAge: -1, path: '/' });
-    return response;
+    return NextResponse.json({ message: 'Invalid refresh token' }, { status: 401 });
   }
 }
