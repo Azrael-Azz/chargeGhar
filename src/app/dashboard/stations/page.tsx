@@ -18,11 +18,11 @@ import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
 const StationsPage: React.FC = () => {
     const router = useRouter();
-    const { dashboardData, loading, error } = useDashboardData();
+    const { stationsData, loading, error } = useDashboardData();
 
     const [search, setSearch] = useState("");
 
-    const stations = dashboardData?.stations?.results || [];
+    const stations = stationsData?.results || [];
 
     const filteredStations = stations.filter(
         (s: any) =>

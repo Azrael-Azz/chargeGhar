@@ -14,8 +14,7 @@ import { useDashboardData } from "../contexts/DashboardDataContext";
 const COLORS = ["#47b216", "#82ea80", "#66bb6a", "#3c8c3c"];
 
 const StationUtilizationChart: React.FC = () => {
-    const { dashboardData, loading, error } = useDashboardData();
-
+    const { stationsData, loading, error } = useDashboardData();
     if (loading) {
         return <div>Loading Station Utilization...</div>;
     }
@@ -24,7 +23,7 @@ const StationUtilizationChart: React.FC = () => {
         return <div>Error loading Station Utilization: {error}</div>;
     }
 
-    const stations = dashboardData?.stations?.results || [];
+    const stations = stationsData?.results || [];
 
     const chartData = stations.map((station: any) => {
         const utilizedSlots = station.total_slots - station.available_slots;

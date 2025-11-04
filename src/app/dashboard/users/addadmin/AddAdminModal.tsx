@@ -9,7 +9,7 @@ export default function AddAdminModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("admin");
   const [error, setError] = useState<string | null>(null);
-  const { dashboardData, loading, error: dashboardError, refetch } = useDashboardData();
+  const { dashboardData, loading, error: dashboardError, refetchProfiles } = useDashboardData();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,7 +19,7 @@ export default function AddAdminModal({ onClose }: { onClose: () => void }) {
       const response = await instance.post("/api/admin/profiles", { user: email, role });
       if (response.data.success) {
         onClose();
-        refetch(); // This function needs to be implemented in the context to refetch data
+        refetchProfiles(); // This function needs to be implemented in the context to refetch data
       } else {
         setError(response.data.message || "Failed to create admin");
       }

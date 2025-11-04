@@ -20,10 +20,9 @@ const StationsActiveCard: React.FC = () => {
     return <StatsCard icon={<FiCheckCircle />} title="Stations Active" value="Error" />;
   }
 
-  const activeStations = dashboardData?.stations?.results?.filter((station: Station) => station.status === 'ONLINE') || [];
 
   return (
-    <StatsCard icon={<FiCheckCircle />} title="Stations Active" value={activeStations.length} />
+    <StatsCard icon={<FiCheckCircle />} title="Stations Active" value={dashboardData?.online_stations} />
   );
 };
 

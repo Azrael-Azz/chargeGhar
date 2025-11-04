@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import styles from "./settings.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
+import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
 export default function SettingsPage() {
-    const [packages] = useState([
-        { id: 1, name: "1 Hour Package", duration: "1 Hour", price: "₹100", active: true },
-        { id: 2, name: "1 Day Package", duration: "1 Day", price: "₹500", active: false },
-    ]);
+    const { packagesData, loading, error } = useDashboardData();
+
+    const packages = packagesData?.packages || [];
 
     const [coupons] = useState([
         { id: 1, code: "SAVE10", discount: "10%", status: "Active" },
@@ -33,6 +33,14 @@ export default function SettingsPage() {
         }
     };
 
+    if (loading) {
+        return <div className={styles.settingsContainer}>Loading...</div>;
+    }
+
+    if (error) {
+        return <div className={styles.settingsContainer}>{error}</div>;
+    }
+
     return (
         <div className={styles.settingsContainer}>
             <h1 className={styles.title}>Settings</h1>
@@ -56,15 +64,15 @@ export default function SettingsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {packages.map((pkg) => (
+                        {packages.map((pkg: any) => (
                             <tr key={pkg.id}>
                                 <td>{pkg.id}</td>
                                 <td>{pkg.name}</td>
-                                <td>{pkg.duration}</td>
+                                <td>{pkg.duration_display}</td>
                                 <td>{pkg.price}</td>
                                 <td>
-                                    <span className={`${styles.status} ${pkg.active ? styles.active : styles.inactive}`}>
-                                        {pkg.active ? "Active" : "Inactive"}
+                                    <span className={`${styles.status} ${pkg.is_active ? styles.active : styles.inactive}`}>
+                                        {pkg.is_active ? "Active" : "Inactive"}
                                     </span>
                                 </td>
                                 <td>
