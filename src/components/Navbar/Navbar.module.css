@@ -18,10 +18,8 @@
 }
 
 .navList {
-    list-style: none;
     padding: 0;
     width: 100%;
-    transition: background 1s;
 }
 
 .navItem {
@@ -30,9 +28,7 @@
     gap: 15px;
     padding: 12px 20px;
     color: #fff;
-    text-decoration: none;
     border-radius: 8px;
-    transition: background 1s;
 }
 
 .navItem:hover {
@@ -48,4 +44,21 @@
     color: #fff;
     font-size: 15px;
     font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease,
+        visibility 0s linear;
+}
+
+.expanded .label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition:
+        opacity 0.25s ease 0.25s,
+        transform 0.25s ease 0.25s,
+        visibility 0s linear 0.25s;
 }
