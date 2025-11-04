@@ -14,37 +14,43 @@ interface Station {
     utilization: number;
 }
 
+import { useDashboardData } from "../../../contexts/DashboardDataContext";
+
 const StationsPage: React.FC = () => {
     const router = useRouter();
-
-    const [stations, setStations] = useState<Station[]>([
-        { id: 1, name: "Station A", location: "MachhaPokhari", status: "Active", chargers: 12, utilization: 76 },
-        { id: 2, name: "Station B", location: "chabhahil", status: "Offline", chargers: 8, utilization: 0 },
-        { id: 3, name: "Station C", location: "Delhi bzzar", status: "Active", chargers: 15, utilization: 58 },
-        { id: 4, name: "Station D", location: "Bangbazzar", status: "Maintenance", chargers: 10, utilization: 22 },
-    ]);
+    const { dashboardData, loading, error } = useDashboardData();
 
     const [search, setSearch] = useState("");
 
+    const stations = dashboardData?.stations?.results || [];
+
     const filteredStations = stations.filter(
-        (s) =>
-            s.name.toLowerCase().includes(search.toLowerCase()) ||
-            s.location.toLowerCase().includes(search.toLowerCase())
+        (s: any) =>
+            s.station_name.toLowerCase().includes(search.toLowerCase()) ||
+            s.address.toLowerCase().includes(search.toLowerCase())
     );
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         if (confirm("Are you sure you want to delete this station?")) {
-            setStations(stations.filter((s) => s.id !== id));
+            // Implement delete functionality here
         }
     };
 
-    const handleEdit = (id: number) => {
-        router.push("/dashboard/stations/edit/${id}");
+    const handleEdit = (id: string) => {
+        router.push(`/dashboard/stations/edit/${id}`);
     };
 
     const handleAdd = () => {
         router.push("/dashboard/stations/add");
     };
+
+    if (loading) {
+        return <div className={styles.pageContainer}>Loading...</div>;
+    }
+
+    if (error) {
+        return <div className={styles.pageContainer}>{error}</div>;
+    }
 
     return (
         <div className={styles.pageContainer}>
@@ -84,27 +90,27 @@ const StationsPage: React.FC = () => {
 
                     <tbody>
                         {filteredStations.length > 0 ? (
-                            filteredStations.map((station) => (
+                            filteredStations.map((station: any, index: number) => (
                                 <tr key={station.id}>
-                                    <td>{station.id}</td>
+                                    <td>{index + 1}</td>
                                     <td>
-                                        <FiMapPin className={styles.icon} /> {station.name}
+                                        <FiMapPin className={styles.icon} /> {station.station_name}
                                     </td>
-                                    <td>{station.location}</td>
+                                    <td>{station.address}</td>
                                     <td>
                                         <span className={`${styles.status} ${styles[station.status.toLowerCase()]}`}>
                                             {station.status}
                                         </span>
                                     </td>
-                                    <td>{station.chargers}</td>
+                                    <td>{station.total_slots}</td>
                                     <td>
                                         <div className={styles.utilizationBar}>
                                             <div
                                                 className={styles.utilizationFill}
-                                                style={{ width: `${station.utilization}%` }}
+                                                style={{ width: `${(station.total_slots - station.available_slots) / station.total_slots * 100}%` }}
                                             />
                                         </div>
-                                        <span className={styles.utilizationText}>{station.utilization}%</span>
+                                        <span className={styles.utilizationText}>{`${(station.total_slots - station.available_slots) / station.total_slots * 100}%`}</span>
                                     </td>
                                     <td>
                                         <button className={styles.editButton} onClick={() => handleEdit(station.id)}>
