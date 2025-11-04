@@ -41,8 +41,10 @@ const Navbar: React.FC = () => {
                                 href={item.href}
                                 className={`${styles.navItem} ${isActive ? styles.active : ""}`}
                             >
+
                                 <span className={styles.icon}>{item.icon}</span>
-                                {hovered && <span className={styles.label}>{item.label}</span>}
+                                <span className={styles.label}>{item.label}</span>
+
                             </Link>
                         </li>
                     );
