@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     formData.append('password', password);
 
     const response = await axios.post(
-      'https://main.chargeghar.com/api/admin/login',
+      `${process.env.BASE_URL}/admin/login`,
       formData,
       {
         headers: {

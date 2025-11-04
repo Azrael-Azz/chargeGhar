@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const formData = new FormData();
     formData.append('refresh', refreshToken);
 
-    const response = await axios.post('https://main.chargeghar.com/api/auth/refresh', formData, {
+    const response = await axios.post(`${process.env.BASE_URL}/auth/refresh`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'X-CSRFTOKEN': csrfToken,

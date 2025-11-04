@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar/Navbar";
 import Header from "@/components/Header/Header";
 import styles from "./dashboard.module.css";
+import { DashboardDataProvider } from '../../contexts/DashboardDataContext';
 
 export default function DashboardLayout({
     children,
@@ -48,12 +49,14 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className={styles.layout}>
-            <Navbar />
-            <div className={styles.main}>
-                <Header />
-                <main className={styles.content}>{children}</main>
+        <DashboardDataProvider>
+            <div className={styles.layout}>
+                <Navbar />
+                <div className={styles.main}>
+                    <Header />
+                    <main className={styles.content}>{children}</main>
+                </div>
             </div>
-        </div>
+        </DashboardDataProvider>
     );
 }

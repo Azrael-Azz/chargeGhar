@@ -7,7 +7,7 @@ interface Props {
     value: string;
 }
 
-const StatsCard: React.FC<Props> = ({ icon, title, value }) => {
+const StatsCard: React.FC<Props> = ({ icon, title, value }: Props) => {
     return (
         <div className={styles.statsCard}>
             <div className={styles.icon}>{icon}</div>
