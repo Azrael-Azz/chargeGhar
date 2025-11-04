@@ -1,10 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Modal from "../../../components/modal/modal";
 import styles from "./settings.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
 
 export default function SettingsPage() {
+    // ================= STATE =================
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalTitle, setModalTitle] = useState("");
+    const [selectedSection, setSelectedSection] = useState("");
+
     const [packages] = useState([
         { id: 1, name: "1 Hour Package", duration: "1 Hour", price: "₹100", active: true },
         { id: 2, name: "1 Day Package", duration: "1 Day", price: "₹500", active: false },
@@ -26,6 +32,15 @@ export default function SettingsPage() {
         phone: "98******51",
     });
 
+    // ================= HANDLERS =================
+    const handleOpenModal = (title: string, section: string) => {
+        setModalTitle(title);
+        setSelectedSection(section);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => setIsModalOpen(false);
+
     const handleEdit = (field: keyof typeof admin) => {
         const newValue = prompt(`Enter new ${field}:`, admin[field]);
         if (newValue) {
@@ -33,17 +48,24 @@ export default function SettingsPage() {
         }
     };
 
+    // ================= UI =================
     return (
         <div className={styles.settingsContainer}>
             <h1 className={styles.title}>Settings</h1>
             <p className={styles.subtitle}>Manage system configurations</p>
 
-            {/* PACKAGES SECTION */}
+            {/* ================= PACKAGES SECTION ================= */}
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2>Packages</h2>
-                    <button className={styles.addButton}><FiPlus /> Add Package</button>
+                    <button
+                        className={styles.addButton}
+                        onClick={() => handleOpenModal("Add Package", "package")}
+                    >
+                        <FiPlus /> Add Package
+                    </button>
                 </div>
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -63,7 +85,10 @@ export default function SettingsPage() {
                                 <td>{pkg.duration}</td>
                                 <td>{pkg.price}</td>
                                 <td>
-                                    <span className={`${styles.status} ${pkg.active ? styles.active : styles.inactive}`}>
+                                    <span
+                                        className={`${styles.status} ${pkg.active ? styles.active : styles.inactive
+                                            }`}
+                                    >
                                         {pkg.active ? "Active" : "Inactive"}
                                     </span>
                                 </td>
@@ -77,12 +102,18 @@ export default function SettingsPage() {
                 </table>
             </section>
 
-            {/* COUPONS SECTION */}
+            {/* ================= COUPONS SECTION ================= */}
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2>Coupons</h2>
-                    <button className={styles.addButton}><FiPlus /> Add Coupon</button>
+                    <button
+                        className={styles.addButton}
+                        onClick={() => handleOpenModal("Add Coupon", "coupon")}
+                    >
+                        <FiPlus /> Add Coupon
+                    </button>
                 </div>
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -99,7 +130,14 @@ export default function SettingsPage() {
                                 <td>{c.id}</td>
                                 <td>{c.code}</td>
                                 <td>{c.discount}</td>
-                                <td><span className={`${styles.status} ${c.status === "Active" ? styles.active : styles.inactive}`}>{c.status}</span></td>
+                                <td>
+                                    <span
+                                        className={`${styles.status} ${c.status === "Active" ? styles.active : styles.inactive
+                                            }`}
+                                    >
+                                        {c.status}
+                                    </span>
+                                </td>
                                 <td>
                                     <button className={styles.editBtn}><FiEdit /></button>
                                     <button className={styles.deleteBtn}><FiTrash2 /></button>
@@ -110,15 +148,26 @@ export default function SettingsPage() {
                 </table>
             </section>
 
-            {/* ACHIEVEMENTS SECTION */}
+            {/* ================= ACHIEVEMENTS SECTION ================= */}
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2>Achievements and Points Assignment</h2>
                     <div className={styles.headerActions}>
-                        <button className={styles.addButton}><FiPlus /> Assign Points</button>
-                        <button className={styles.addButton}><FiPlus /> Add Achievement</button>
+                        <button
+                            className={styles.addButton}
+                            onClick={() => handleOpenModal("Assign Points", "points")}
+                        >
+                            <FiPlus /> Assign Points
+                        </button>
+                        <button
+                            className={styles.addButton}
+                            onClick={() => handleOpenModal("Add Achievement", "achievement")}
+                        >
+                            <FiPlus /> Add Achievement
+                        </button>
                     </div>
                 </div>
+
                 <table className={styles.table}>
                     <thead>
                         <tr>
@@ -137,7 +186,14 @@ export default function SettingsPage() {
                                 <td>{a.name}</td>
                                 <td>{a.points} pts</td>
                                 <td>{a.difficulty}</td>
-                                <td><span className={`${styles.status} ${a.active ? styles.active : styles.inactive}`}>{a.active ? "Active" : "Inactive"}</span></td>
+                                <td>
+                                    <span
+                                        className={`${styles.status} ${a.active ? styles.active : styles.inactive
+                                            }`}
+                                    >
+                                        {a.active ? "Active" : "Inactive"}
+                                    </span>
+                                </td>
                                 <td>
                                     <button className={styles.editBtn}><FiEdit /></button>
                                     <button className={styles.deleteBtn}><FiTrash2 /></button>
@@ -148,98 +204,139 @@ export default function SettingsPage() {
                 </table>
             </section>
 
-            {/* ADMIN PROFILE UPDATE */}
+            {/* ================= ADMIN PROFILE UPDATE ================= */}
             <section className={styles.profileSection}>
-                <h2>Admin Profile Update</h2>
-                <div className={styles.profileSection}>
-                    <h2 className={styles.profileTitle}>Admin Profile Update</h2>
+                <h2 className={styles.profileTitle}>Admin Profile Update</h2>
 
-                    <div className={styles.profileContainer}>
-                        {/* Left Card */}
-                        <div className={styles.leftCard}>
-                            <div className={styles.profileTop}>
-                                <div className={styles.avatar}>
-                                    <FiUser className={styles.profileIcon} />
-                                </div>
-                                <div className={styles.profileHeader}>
-                                    <h3>{admin.name}</h3>
-                                    <button className={styles.editProfileBtn}>
-                                        <FiEdit /> Edit Profile
-                                    </button>
-                                </div>
+                <div className={styles.profileContainer}>
+                    {/* LEFT CARD */}
+                    <div className={styles.leftCard}>
+                        <div className={styles.profileTop}>
+                            <div className={styles.avatar}>
+                                <FiUser className={styles.profileIcon} />
                             </div>
-
-                            <div className={styles.profileDetails}>
-                                <div className={styles.profileRow}>
-                                    <span>User ID:</span>
-                                    <span>{admin.userId}</span>
-                                </div>
-
-                                <div className={styles.profileRow}>
-                                    <span>Username:</span>
-                                    <span>{admin.name}</span>
-                                    <button className={styles.inlineEdit} onClick={() => handleEdit("name")}>
-                                        <FiEdit />
-                                    </button>
-                                </div>
-
-                                <div className={styles.profileRow}>
-                                    <span>Email:</span>
-                                    <span>{admin.email}</span>
-                                    <button className={styles.inlineEdit} onClick={() => handleEdit("email")}>
-                                        <FiEdit />
-                                    </button>
-                                </div>
-
-                                <div className={styles.profileRow}>
-                                    <span>Phone:</span>
-                                    <span>{admin.phone}</span>
-                                    <button className={styles.inlineEdit} onClick={() => handleEdit("phone")}>
-                                        <FiEdit />
-                                    </button>
-                                </div>
+                            <div className={styles.profileHeader}>
+                                <h3>{admin.name}</h3>
+                                <button className={styles.editProfileBtn}>
+                                    <FiEdit /> Edit Profile
+                                </button>
                             </div>
                         </div>
 
-                        {/* Right Card */}
-                        <div className={styles.rightCard}>
-                            <h3 className={styles.authTitle}>
-                                <FiLock /> Password and Authentication
-                            </h3>
-
-                            <button className={styles.changePassBtn}>Change Password</button>
-
-                            <div className={styles.authBox}>
-                                <h4>Email Authentication</h4>
-                                <p>
-                                    Verify your authentication using Gmail. Your current email account
-                                    is: <span className={styles.bold}>{admin.email}</span>
-                                </p>
-
-                                <div className={styles.active}>
-                                    <label>
-                                        <input type="button" name="emailAuth" defaultChecked /> Active Authentication
-                                    </label>
-                                </div>
+                        <div className={styles.profileDetails}>
+                            <div className={styles.profileRow}>
+                                <span>User ID:</span>
+                                <span>{admin.userId}</span>
                             </div>
 
-                            <div className={styles.authBox}>
-                                <h4>SMS Authentication</h4>
-                                <p>
-                                    Verify using SMS sent to your phone number. Your current phone
-                                    number is: <span className={styles.bold}>{admin.phone}</span>
-                                </p>
+                            <div className={styles.profileRow}>
+                                <span>Username:</span>
+                                <span>{admin.name}</span>
+                                <button
+                                    className={styles.inlineEdit}
+                                    onClick={() => handleEdit("name")}
+                                >
+                                    <FiEdit />
+                                </button>
+                            </div>
 
-                                <div className={styles.deactivate}>
-                                    <label>
-                                        <input type="button" name="smsAuth" defaultChecked /> Deactivate SMS Authentication
-                                    </label>
-                                </div>
+                            <div className={styles.profileRow}>
+                                <span>Email:</span>
+                                <span>{admin.email}</span>
+                                <button
+                                    className={styles.inlineEdit}
+                                    onClick={() => handleEdit("email")}
+                                >
+                                    <FiEdit />
+                                </button>
+                            </div>
+
+                            <div className={styles.profileRow}>
+                                <span>Phone:</span>
+                                <span>{admin.phone}</span>
+                                <button
+                                    className={styles.inlineEdit}
+                                    onClick={() => handleEdit("phone")}
+                                >
+                                    <FiEdit />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT CARD */}
+                    <div className={styles.rightCard}>
+                        <h3 className={styles.authTitle}>
+                            <FiLock /> Password and Authentication
+                        </h3>
+
+                        <button className={styles.changePassBtn}>Change Password</button>
+
+                        <div className={styles.authBox}>
+                            <h4>Email Authentication</h4>
+                            <p>
+                                Verify your authentication using Gmail. Your current email account is:{" "}
+                                <span className={styles.bold}>{admin.email}</span>
+                            </p>
+                            <div className={styles.active}>
+                                <label>Active Authentication</label>
+                            </div>
+                        </div>
+
+                        <div className={styles.authBox}>
+                            <h4>SMS Authentication</h4>
+                            <p>
+                                Verify using SMS sent to your phone number. Your current phone number is:{" "}
+                                <span className={styles.bold}>{admin.phone}</span>
+                            </p>
+                            <div className={styles.deactivate}>
+                                <label>Deactivate SMS Authentication</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* ================= MODAL SECTION ================= */}
+            <Modal title={modalTitle} isOpen={isModalOpen} onClose={handleCloseModal}>
+                {selectedSection === "package" && (
+                    <>
+                        <label>Package Name</label>
+                        <input type="text" placeholder="Enter package name" />
+                        <label>Duration</label>
+                        <input type="text" placeholder="Enter duration" />
+                        <label>Price</label>
+                        <input type="text" placeholder="Enter price" />
+                        <button className="saveBtn">Save</button>
+                    </>
+                )}
+
+                {selectedSection === "coupon" && (
+                    <>
+                        <label>Coupon Code</label>
+                        <input type="text" placeholder="Enter coupon code" />
+                        <label>Discount (%)</label>
+                        <input type="text" placeholder="Enter discount" />
+                        <button className="saveBtn">Save</button>
+                    </>
+                )}
+
+                {selectedSection === "achievement" && (
+                    <>
+                        <label>Achievement Name</label>
+                        <input type="text" placeholder="Enter achievement name" />
+                        <label>Points</label>
+                        <input type="text" placeholder="Enter points" />
+                        <label>Difficulty</label>
+                        <select>
+                            <option>Easy</option>
+                            <option>Medium</option>
+                            <option>Hard</option>
+                        </select>
+                        <button className="saveBtn">Save</button>
+                    </>
+                )}
+            </Modal>
         </div>
     );
 }
