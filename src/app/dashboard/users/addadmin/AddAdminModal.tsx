@@ -2,9 +2,32 @@
 
 import React, { useState } from "react";
 import styles from "./AddAdminModal.module.css";
+import instance from "../../../../lib/axios";
+import { useDashboardData } from "../../../../contexts/DashboardDataContext";
 
 export default function AddAdminModal({ onClose }: { onClose: () => void }) {
-  const [isActive, setIsActive] = useState(true);
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("admin");
+  const [error, setError] = useState<string | null>(null);
+  const { dashboardData, loading, error: dashboardError, refetch } = useDashboardData();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const response = await instance.post("/api/admin/profiles", { user: email, role });
+      if (response.data.success) {
+        onClose();
+        refetch(); // This function needs to be implemented in the context to refetch data
+      } else {
+        setError(response.data.message || "Failed to create admin");
+      }
+    } catch (err: any) {
+      console.error("Error creating admin:", err);
+      setError(err.response?.data?.message || "An error occurred");
+    }
+  };
 
   return (
     <div className={styles.overlay}>
@@ -15,67 +38,24 @@ export default function AddAdminModal({ onClose }: { onClose: () => void }) {
 
         <h2 className={styles.title}>Personal Information</h2>
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.row}>
             <label>
-              Name
-              <input type="text" placeholder="<username>" />
+              Email Address
+              <input type="email" placeholder="<emailaddress>" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </label>
 
             <label>
               Role
-              <select>
-                <option>Admin</option>
-                <option>Editor</option>
-                <option>Viewer</option>
+              <select value={role} onChange={(e) => setRole(e.target.value)}>
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
               </select>
             </label>
           </div>
 
-          <div className={styles.row}>
-            <label>
-              Email Address
-              <input type="email" placeholder="<emailaddress>" />
-            </label>
-
-            <label>
-              Phone Number
-              <input type="tel" placeholder="<phoneno>" />
-            </label>
-          </div>
-
-          <label>
-            Password
-            <input type="password" placeholder="<password>" />
-          </label>
-
-          <div className={styles.statusRow}>
-            <span>Status</span>
-            <div
-              className={`${styles.toggle} ${isActive ? styles.active : ""
-                }`}
-              onClick={() => setIsActive(!isActive)}
-            >
-              <div className={styles.knob}></div>
-            </div>
-            <span
-              className={`${styles.statusText} ${isActive ? styles.activeText : ""
-                }`}
-            >
-              {isActive ? "Active" : "Inactive"}
-            </span>
-          </div>
-
-          <div className={styles.access}>
-            <span>Access Level</span>
-            <div className={styles.accessGrid}>
-              <label><input type="checkbox" name="access" /> Station</label>
-              <label><input type="checkbox" name="access" /> Transactions</label>
-              <label><input type="checkbox" name="access" /> Users</label>
-              <label><input type="checkbox" name="access" /> Settings</label>
-              <label><input type="checkbox" name="access" /> Rentals</label>
-            </div>
-          </div>
+          {error && <p className={styles.errorText}>{error}</p>}
 
           <div className={styles.buttons}>
             <button

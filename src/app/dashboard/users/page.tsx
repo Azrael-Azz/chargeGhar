@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from "react";
 import styles from "./users.module.css";
 
-import adminsData from "../../../Data/admin.json";
 import usersData from "../../../Data/users.json";
 import { FiShield, FiUsers, FiTrash2, FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
 import AddAdminModal from "./addadmin/AddAdminModal";
+import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
 interface User {
   id: string;
@@ -21,6 +21,7 @@ type SortKey = keyof User;
 type SortDirection = "asc" | "desc";
 
 export default function UsersPage() {
+  const { dashboardData, loading, error } = useDashboardData();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("id");
@@ -36,7 +37,7 @@ export default function UsersPage() {
     { key: "createdAt", label: "Created Date" },
   ];
 
-
+  const admins = dashboardData?.profiles || [];
 
   const handleSortSelect = (key: SortKey) => {
     if (sortKey === key) {
@@ -83,6 +84,14 @@ export default function UsersPage() {
     });
   }, [search, sortKey, sortDir]);
 
+  if (loading) {
+    return <main className={styles.container}>Loading...</main>;
+  }
+
+  if (error) {
+    return <main className={styles.container}>{error}</main>;
+  }
+
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -126,7 +135,7 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {adminsData.map((admin) => (
+            {admins.map((admin: any) => (
               <tr key={admin.id}>
                 <td>{admin.id}</td>
                 <td>{admin.name}</td>
@@ -136,7 +145,7 @@ export default function UsersPage() {
                 <td>
                   <span className={styles.statusActive}>Active</span>
                 </td>
-                <td>{admin.createdAt}</td>
+                <td>{admin.created_at}</td>
                 <td>
                   <button className={styles.deleteBtn}>
                     <FiTrash2 />
