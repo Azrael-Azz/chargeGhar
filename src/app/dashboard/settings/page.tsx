@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Modal from "../../../components/modal/modal";
 import styles from "./settings.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
@@ -48,9 +48,24 @@ export default function SettingsPage() {
         }
     };
 
-    // ================= UI =================
+    const handlePasswordChange = (e: React.FormEvent) => {
+        e.preventDefault();
+        const form = e.target as HTMLFormElement;
+        const current = form.current.value;
+        const newPass = form.new.value;
+        const confirm = form.confirm.value;
+
+        if (newPass !== confirm) {
+            alert("New passwords do not match!");
+            return;
+        }
+
+        alert("Password updated successfully!");
+        handleCloseModal();
+    };
+
     return (
-        <div className={styles.settingsContainer}>
+        <div className={styles.container}>
             <h1 className={styles.title}>Settings</h1>
             <p className={styles.subtitle}>Manage system configurations</p>
 
@@ -204,7 +219,6 @@ export default function SettingsPage() {
                 </table>
             </section>
 
-            {/* ================= ADMIN PROFILE UPDATE ================= */}
             <section className={styles.profileSection}>
                 <h2 className={styles.profileTitle}>Admin Profile Update</h2>
 
@@ -269,8 +283,13 @@ export default function SettingsPage() {
                         <h3 className={styles.authTitle}>
                             <FiLock /> Password and Authentication
                         </h3>
+                        <button
+                            className={styles.changePassBtn}
+                            onClick={() => handleOpenModal("Change Password", "password")}
+                        >
+                            Change Password
+                        </button>
 
-                        <button className={styles.changePassBtn}>Change Password</button>
 
                         <div className={styles.authBox}>
                             <h4>Email Authentication</h4>
@@ -307,7 +326,7 @@ export default function SettingsPage() {
                         <input type="text" placeholder="Enter duration" />
                         <label>Price</label>
                         <input type="text" placeholder="Enter price" />
-                        <button className="saveBtn">Save</button>
+                        <button className={styles.saveBtn}>Save</button>
                     </>
                 )}
 
@@ -317,7 +336,7 @@ export default function SettingsPage() {
                         <input type="text" placeholder="Enter coupon code" />
                         <label>Discount (%)</label>
                         <input type="text" placeholder="Enter discount" />
-                        <button className="saveBtn">Save</button>
+                        <button className={styles.saveBtn}>Save</button>
                     </>
                 )}
 
@@ -333,9 +352,53 @@ export default function SettingsPage() {
                             <option>Medium</option>
                             <option>Hard</option>
                         </select>
-                        <button className="saveBtn">Save</button>
+                        <button className={styles.saveBtn}>Save</button>
                     </>
                 )}
+
+                {selectedSection === "points" && (
+                    <>
+                        <label>User Email</label>
+                        <input type="email" placeholder="Enter user email" />
+                        <label>Points Amount</label>
+                        <input type="number" placeholder="Enter points amount" />
+                        <label>Description (optional)</label>
+                        <input type="text" placeholder="Reason for assigning points" />
+                        <button className={styles.saveBtn}>Assign Points</button>
+                    </>
+                )}
+
+
+                {selectedSection === "password" && (
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            const current = (e.currentTarget.elements.namedItem("current") as HTMLInputElement).value;
+                            const newPass = (e.currentTarget.elements.namedItem("new") as HTMLInputElement).value;
+                            const confirm = (e.currentTarget.elements.namedItem("confirm") as HTMLInputElement).value;
+
+                            if (newPass !== confirm) {
+                                alert("New passwords do not match!");
+                                return;
+                            }
+
+                            alert("Password updated successfully!");
+                            handleCloseModal();
+                        }}
+                    >
+                        <label>Current Password</label>
+                        <input name="current" type="password" placeholder="Enter current password" />
+
+                        <label>New Password</label>
+                        <input name="new" type="password" placeholder="Enter new password" />
+
+                        <label>Confirm New Password</label>
+                        <input name="confirm" type="password" placeholder="Confirm new password" />
+
+                        <button type="submit" className=".changePassBtn">Update Password</button>
+                    </form>
+                )}
+
             </Modal>
         </div>
     );

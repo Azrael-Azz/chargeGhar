@@ -1,43 +1,54 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styles from "./dashboard.module.css";
-import { FiUsers, FiDollarSign, FiCheckCircle, FiAlertCircle, FiUserPlus } from "react-icons/fi";
-import StatsCard from "../../components/StatsCard";
-import AdminUsersCard from "../../components/AdminUsersCard/AdminUsersCard";
-import StationsActiveCard from "../../components/StationsActiveCard/StationsActiveCard";
-import DashboardStats from "../../components/DashboardStats/DashboardStats";
-import RevenueChart from "../../components/RevenueChart";
-import StationUtilizationChart from "../../components/StationUtilizationChart";
 import Navbar from "../../components/Navbar/Navbar";
-import instance from "@/lib/axios";
-import axios from "axios";
+import DashboardStats from "../../components/DashboardStatsCard/DashboardStats";
+import RevenueChart from "../../components/RevenueChart";
+import PopularPackages from "../../components/PopularPackageCard/PopularPackages";
+import RecentTransactions from "../../components/RecentTransactionsCard/RecentTransactions";
+import RentalOverTime from "../../components/RentalOverTimeCard/RentalsOverTime";
+import StationUtilizationChart from "../../components/StationUtilizationChart";
+import MonitorRentals from "../../components/MonitorRentalsCard/MonitorRentalsCard";
+import RecentUpdates from "../../components/RecentUpdates/RecentUpdates";
 
 const Dashboard: React.FC = () => {
     return (
         <div className={styles.dashboardPage}>
+            <Navbar />
             <div className={styles.dashboardContainer}>
-                <Navbar />
+                <header className={styles.header}>
+                    <h1>Dashboard</h1>
+                    <p>Welcome back, <span className={styles.adminName}>Admin 👋</span></p>
+                </header>
 
-                <div className={styles.content}>
-                    <h1 className={styles.title}>Dashboard</h1>
-                    <span className={styles.welcomeText}>
-                        Welcome back, <span className={styles.adminName}>Admin</span>
-                    </span>
+                {/* Top Statistics Row */}
+                <section className={styles.topStats}>
+                    <DashboardStats />
+                </section>
 
-                    {/* Stats Cards */}
-                    <section className={styles.statsSection}>
-                        <DashboardStats />
-                        <AdminUsersCard />
-                        <StationsActiveCard />
-                    </section>
+                {/* Revenue Section */}
+                <section className={styles.revenueSection}>
+                    <RevenueChart />
+                </section>
 
-                    <div className={styles.grid}>
-                        <RevenueChart />
-                    </div>
+                {/* Popular Packages + Recent Transactions side by side */}
+                <section className={styles.twoColumn}>
+                    <PopularPackages />
+                    <RecentTransactions />
+                </section>
 
+                {/* Rental Over Time + Station Utilization side by side */}
+                <section className={styles.twoColumn}>
+                    <RentalOverTime />
                     <StationUtilizationChart />
-                </div>
+                </section>
+
+                {/* Monitor Rentals and Recent Updates stacked */}
+                <section className={styles.bottomSection}>
+                    <MonitorRentals />
+                    <RecentUpdates />
+                </section>
             </div>
         </div>
     );

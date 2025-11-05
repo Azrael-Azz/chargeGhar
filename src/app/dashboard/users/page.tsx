@@ -2,9 +2,15 @@
 
 import React, { useState, useMemo } from "react";
 import styles from "./users.module.css";
-
-import usersData from "../../../Data/users.json";
-import { FiShield, FiUsers, FiTrash2, FiFilter, FiSearch, FiChevronDown } from "react-icons/fi";
+import {
+  FiShield,
+  FiUsers,
+  FiTrash2,
+  FiSearch,
+  FiArrowDown,
+  FiChevronDown,
+  FiChevronUp,
+} from "react-icons/fi";
 import AddAdminModal from "./addadmin/AddAdminModal";
 import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
@@ -17,18 +23,35 @@ interface User {
   createdAt: string;
 }
 
-type SortKey = keyof User;
-type SortDirection = "asc" | "desc";
-
 export default function UsersPage() {
   const { dashboardData, loading, error } = useDashboardData();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("id");
-  const [sortDir, setSortDir] = useState<SortDirection>("asc");
+  const [sortKey, setSortKey] = useState<keyof User>("id");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [showSortMenu, setShowSortMenu] = useState(false);
 
-  const sortOptions: { key: SortKey; label: string }[] = [
+  // Static mock data — defined inside component
+  const usersData: User[] = [
+    {
+      id: "U001",
+      name: "User One",
+      email: "user1@email.com",
+      phone: "9841111111",
+      rentals: "3",
+      createdAt: "08/09/2025",
+    },
+    {
+      id: "U002",
+      name: "User Two",
+      email: "user2@email.com",
+      phone: "9852222222",
+      rentals: "5",
+      createdAt: "08/09/2025",
+    },
+  ];
+
+  const sortOptions: { key: keyof User; label: string }[] = [
     { key: "id", label: "ID" },
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
@@ -39,7 +62,7 @@ export default function UsersPage() {
 
   const admins = dashboardData?.profiles || [];
 
-  const handleSortSelect = (key: SortKey) => {
+  const handleSortSelect = (key: keyof User) => {
     if (sortKey === key) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -50,18 +73,23 @@ export default function UsersPage() {
   };
 
   const displayedUsers = useMemo((): User[] => {
-    let list: User[] = usersData as User[];
+    let list: User[] = [...usersData];
 
+    // Search: filter by ID, name, email, phone
     if (search.trim()) {
       const q = search.trim().toLowerCase();
+      const phoneDigits = search.replace(/\D/g, "");
       list = list.filter(
         (u) =>
-          u.id.includes(search.trim()) ||
-          u.name.toLowerCase().includes(q)
+          u.id.toLowerCase().includes(q) ||
+          u.name.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q) ||
+          u.phone.includes(phoneDigits)
       );
     }
 
-    return [...list].sort((a, b) => {
+    // Sort
+    return list.sort((a, b) => {
       let aVal: string | number = a[sortKey];
       let bVal: string | number = b[sortKey];
 
@@ -82,7 +110,7 @@ export default function UsersPage() {
       if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-  }, [search, sortKey, sortDir]);
+  }, [search, sortKey, sortDir, usersData]);
 
   if (loading) {
     return <main className={styles.container}>Loading...</main>;
@@ -135,24 +163,32 @@ export default function UsersPage() {
             </tr>
           </thead>
           <tbody>
-            {admins.map((admin: any) => (
-              <tr key={admin.id}>
-                <td>{admin.id}</td>
-                <td>{admin.name}</td>
-                <td>{admin.email}</td>
-                <td>{admin.phone}</td>
-                <td>{admin.role}</td>
-                <td>
-                  <span className={styles.statusActive}>Active</span>
-                </td>
-                <td>{admin.created_at}</td>
-                <td>
-                  <button className={styles.deleteBtn}>
-                    <FiTrash2 />
-                  </button>
+            {admins.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: "center", padding: "2rem", color: "#888" }}>
+                  No admins found
                 </td>
               </tr>
-            ))}
+            ) : (
+              admins.map((admin: any) => (
+                <tr key={admin.id}>
+                  <td>{admin.id}</td>
+                  <td>{admin.name}</td>
+                  <td>{admin.email}</td>
+                  <td>{admin.phone}</td>
+                  <td>{admin.role || "Admin"}</td>
+                  <td>
+                    <span className={styles.statusActive}>Active</span>
+                  </td>
+                  <td>{admin.created_at || admin.createdAt || "—"}</td>
+                  <td>
+                    <button className={styles.deleteBtn} title="Delete admin">
+                      <FiTrash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </section>
@@ -160,23 +196,44 @@ export default function UsersPage() {
       {/* USER CONTROLS */}
       <div className={styles.controls}>
         {/* SEARCH */}
-        <div style={{ position: "relative", width: "200px" }}>
+        <div style={{ position: "relative", width: "240px" }}>
           <FiSearch
             style={{
               position: "absolute",
-              left: "0.6rem",
+              left: "0.75rem",
               top: "50%",
               transform: "translateY(-50%)",
               color: "#777",
+              fontSize: "1rem",
             }}
           />
           <input
             className={styles.search}
-            placeholder="Search"
+            placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: "2rem" }}
+            style={{ paddingLeft: "2.5rem", paddingRight: search ? "2rem" : "1rem" }}
           />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              style={{
+                position: "absolute",
+                right: "0.75rem",
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                color: "#aaa",
+                fontSize: "1.2rem",
+                cursor: "pointer",
+                padding: 0,
+              }}
+              title="Clear search"
+            >
+              ×
+            </button>
+          )}
         </div>
 
         {/* SORT BY BUTTON */}
@@ -184,14 +241,19 @@ export default function UsersPage() {
           <button
             className={styles.sortBtn}
             onClick={() => setShowSortMenu((s) => !s)}
-            style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.5rem 1rem",
+            }}
           >
-            <FiFilter className={styles.icon} />
+            <FiArrowDown style={{ fontSize: "1rem" }} />
             Sort By
-            <FiSearch style={{ fontSize: "0.8rem" }} />
+            <FiChevronDown style={{ fontSize: "0.8rem", marginLeft: "0.25rem" }} />
           </button>
 
-          {/* SORT OPTIONS – ONLY TEXT HOVERS GREEN */}
+          {/* SORT OPTIONS */}
           {showSortMenu && (
             <div
               style={{
@@ -205,6 +267,7 @@ export default function UsersPage() {
                 zIndex: 10,
                 marginTop: "0.5rem",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                overflow: "hidden",
               }}
             >
               {sortOptions.map((opt) => (
@@ -212,43 +275,36 @@ export default function UsersPage() {
                   key={opt.key}
                   onClick={() => handleSortSelect(opt.key)}
                   style={{
-
                     width: "100%",
-                    padding: "0.6rem 1rem",
+                    padding: "0.75rem 1rem",
                     textAlign: "left",
-                    background: sortKey === opt.key ? "rgba(240, 240, 240, 0.3)" : "transparent",
-                    color: sortKey === opt.key ? "#000" : "#ccc",
+                    background: sortKey === opt.key ? "#333" : "transparent",
+                    color: sortKey === opt.key ? "#fff" : "#ccc",
                     border: "none",
                     fontSize: "0.9rem",
                     cursor: "pointer",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (sortKey !== opt.key) {
+                      e.currentTarget.style.backgroundColor = "#2a2a2a";
+                      e.currentTarget.style.color = "#32cd32";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (sortKey !== opt.key) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ccc";
+                    }
                   }}
                 >
-                  {/* TEXT WITH GREEN HOVER */}
-                  <span
-                    onMouseEnter={(e) => {
-                      if (sortKey !== opt.key) {
-                        e.currentTarget.style.color = "#32cd32";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (sortKey !== opt.key) {
-                        e.currentTarget.style.color = "#ccc";
-                      }
-                    }}
-                    style={{
-                      transition: "color 0.2s",
-                    }}
-                  >
-                    {opt.label}
-                  </span>
-
-                  {/* ASC/DESC ICON */}
+                  <span>{opt.label}</span>
                   {sortKey === opt.key && (
-                    <span style={{ fontSize: "0.8rem", color: "#000" }}>
-                      {sortDir === "asc" ? "up" : "down"}
+                    <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>
+                      {sortDir === "asc" ? <FiChevronUp /> : <FiChevronDown />}
                     </span>
                   )}
                 </button>
@@ -283,8 +339,16 @@ export default function UsersPage() {
           <tbody>
             {displayedUsers.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "2rem", color: "#888" }}>
-                  No users found
+                <td
+                  colSpan={8}
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#888",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {search ? "No users match your search." : "No users found."}
                 </td>
               </tr>
             ) : (
@@ -300,7 +364,7 @@ export default function UsersPage() {
                   </td>
                   <td>{user.createdAt}</td>
                   <td>
-                    <button className={styles.deleteBtn}>
+                    <button className={styles.deleteBtn} title="Delete user">
                       <FiTrash2 />
                     </button>
                   </td>
