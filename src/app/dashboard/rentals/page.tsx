@@ -92,12 +92,10 @@ export default function RentalsPage() {
 
   return (
     <main className={styles.container}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>Rentals</h1>
-        <p className={styles.subtitle}>
-          View and manage all the rental history and packages.
-        </p>
-      </header>
+      <h1 className={styles.title}>Rentals</h1>
+      <p className={styles.subtitle}>
+        View and manage all the rental history and packages.
+      </p>
 
       {/* Tabs */}
       <div className={styles.tabs}>

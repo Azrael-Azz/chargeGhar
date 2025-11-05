@@ -1,14 +1,25 @@
-.pageContainer {
+.container {
     color: #fff;
     background-color: #0b0b0b;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 4rem;
-    margin-left: 30px;
+    padding: 5rem;
+    margin-left: 3rem;
+    margin-top: 2rem;
 }
 
-/* ---------- Header Section ---------- */
+.title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #82ea80;
+}
+
+.subtitle {
+    color: #aaa;
+    margin-bottom: 1.5rem;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -60,7 +71,7 @@
     font-size: 0.9rem;
 }
 
-/* ---------- Add Button ---------- */
+
 .addButton {
     display: flex;
     align-items: center;
@@ -194,4 +205,13 @@
     text-align: center;
     padding: 2rem 0;
     color: #888;
+}
+
+.clickableRow {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.clickableRow:hover {
+    background-color: #1a1a1a;
 }

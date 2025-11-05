@@ -1,21 +1,22 @@
 .container {
-    padding: 4rem;
-    background-color: #0b0b0b;
     color: #fff;
+    background-color: #0b0b0b;
     min-height: 100vh;
-    font-family: "Inter", sans-serif;
-    margin-left: 30px;
+    display: flex;
+    flex-direction: column;
+    padding: 5rem;
+    margin-left: 3rem;
+    margin-top: 2rem;
 }
 
-.pageTitle {
+.title {
     font-size: 2rem;
     font-weight: 600;
     color: #82ea80;
-    margin-bottom: 2rem;
 }
 
-.pageSubtitle {
-    color: #bbb;
+.subtitle {
+    color: #aaa;
     margin-bottom: 1.5rem;
 }
 

@@ -39,8 +39,8 @@ export default function ProfilePage() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.pageTitle}>Profile</h1>
-            <p className={styles.pageSubtitle}>Manage your profile.</p>
+            <h1 className={styles.title}>Profile</h1>
+            <p className={styles.subtitle}>Manage your profile.</p>
 
             {/* Profile Header */}
             <div className={styles.profileHeader}>

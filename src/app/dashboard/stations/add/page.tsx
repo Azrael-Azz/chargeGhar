@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./add.module.css";
 import { FaCoffee, FaRestroom, FaStore, FaParking, FaCouch } from "react-icons/fa";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import { FaMapMarkerAlt, FaImage, FaCheckCircle } from "react-icons/fa";
-import Image from "next/image";
+import { FaImage, FaCheckCircle } from "react-icons/fa";
 
 const AddStationPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -32,21 +31,19 @@ const AddStationPage: React.FC = () => {
 
   const handleAmenityToggle = (amenity: string) => {
     setAmenities((prev) =>
-      prev.includes(amenity)
-        ? prev.filter((a) => a !== amenity)
-        : [...prev, amenity]
+      prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity]
     );
   };
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((s) => s + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep((s) => s - 1);
     }
   };
 
@@ -54,11 +51,24 @@ const AddStationPage: React.FC = () => {
     setCurrentStep(step);
   };
 
+  // Revoke previously created object URL before creating a new one to avoid leaks
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
+
+    // revoke previous preview if exists
+    if (imagePreview) {
+      try {
+        URL.revokeObjectURL(imagePreview);
+      } catch (err) {
+        // ignore
+      }
+    }
+
     setImage(file);
+
     if (file) {
-      setImagePreview(URL.createObjectURL(file));
+      const newPreview = URL.createObjectURL(file);
+      setImagePreview(newPreview);
     } else {
       setImagePreview(null);
     }
@@ -69,15 +79,29 @@ const AddStationPage: React.FC = () => {
   };
 
   const handleFinalConfirm = () => {
+    // Optionally you can send API request here
     setShowConfirmModal(false);
-    // Handle final submission, e.g., API call
     alert("Station added successfully!");
-    // Optionally reset form or redirect
+    // if you reset the form, always reset to empty strings (not undefined)
+    // setStationName(""); setCapacity(""); etc.
   };
 
   const handleCancelConfirm = () => {
     setShowConfirmModal(false);
   };
+
+  // Cleanup on unmount or when imagePreview changes
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        try {
+          URL.revokeObjectURL(imagePreview);
+        } catch (err) {
+          // ignore
+        }
+      }
+    };
+  }, [imagePreview]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -93,7 +117,7 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="Enter station name"
                   value={stationName}
-                  onChange={(e) => setStationName(e.target.value)}
+                  onChange={(e) => setStationName(e.target.value || "")}
                 />
               </div>
               <div>
@@ -103,7 +127,7 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="e.g. 8 Powerbanks"
                   value={capacity}
-                  onChange={(e) => setCapacity(e.target.value)}
+                  onChange={(e) => setCapacity(e.target.value || "")}
                 />
               </div>
               <div>
@@ -113,7 +137,7 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="Enter station location"
                   value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+                  onChange={(e) => setLocation(e.target.value || "")}
                 />
               </div>
               <div>
@@ -123,7 +147,7 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="e.g. 4 Powerbanks"
                   value={powerbanks}
-                  onChange={(e) => setPowerbanks(e.target.value)}
+                  onChange={(e) => setPowerbanks(e.target.value || "")}
                 />
               </div>
             </div>
@@ -152,6 +176,7 @@ const AddStationPage: React.FC = () => {
             </div>
           </>
         );
+
       case 2:
         return (
           <>
@@ -164,7 +189,7 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="Enter longitude"
                   value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
+                  onChange={(e) => setLongitude(e.target.value || "")}
                 />
               </div>
               <div>
@@ -174,10 +199,11 @@ const AddStationPage: React.FC = () => {
                   type="text"
                   placeholder="Enter latitude"
                   value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
+                  onChange={(e) => setLatitude(e.target.value || "")}
                 />
               </div>
             </div>
+
             <div className={styles.mapPlaceholder}>
               <iframe
                 title="Station Map"
@@ -186,11 +212,12 @@ const AddStationPage: React.FC = () => {
                 style={{ border: 0, borderRadius: "10px" }}
                 loading="lazy"
                 allowFullScreen
-                src={`https://www.google.com/maps?q=${latitude || 27.7172},${longitude || 85.3240}&z=14&output=embed`}
+                src={`https://www.google.com/maps?q=${latitude || 27.7172},${longitude || 85.324}&z=14&output=embed`}
               />
             </div>
           </>
         );
+
       case 3:
         return (
           <>
@@ -204,28 +231,64 @@ const AddStationPage: React.FC = () => {
                   accept="image/*"
                   onChange={handleImageUpload}
                 />
-                {imagePreview && (
+
+                {imagePreview && typeof imagePreview === "string" && (
                   <div className={styles.imagePreview}>
-                    <Image src={imagePreview} alt="Preview" style={{ width: "100%", borderRadius: "8px", marginTop: "10px" }} />
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        borderRadius: "8px",
+                        marginTop: "10px",
+                        objectFit: "cover",
+                      }}
+                    />
                   </div>
                 )}
               </div>
             </div>
           </>
         );
+
       case 4:
         return (
           <>
             <h2>Review & Complete</h2>
             <div className={styles.summary}>
-              <h3>Station Summary</h3>~
-              <p><strong>Name:</strong> {stationName || "Not set"}</p>
-              <p><strong>Location:</strong> {location || "Not set"}</p>
-              <p><strong>Capacity:</strong> {capacity || "Not set"}</p>
-              <p><strong>Powerbanks:</strong> {powerbanks || "Not set"}</p>
-              <p><strong>Amenities:</strong> {amenities.length > 0 ? amenities.join(", ") : "None"}</p>
-              <p><strong>Coordinates:</strong> Lat: {latitude || "Not set"}, Lng: {longitude || "Not set"}</p>
-              {imagePreview && <img src={imagePreview} alt="Location" style={{ width: "100%", borderRadius: "8px", marginTop: "10px" }} />}
+              <h3>Station Summary</h3>
+              <p>
+                <strong>Name:</strong> {stationName || "Not set"}
+              </p>
+              <p>
+                <strong>Location:</strong> {location || "Not set"}
+              </p>
+              <p>
+                <strong>Capacity:</strong> {capacity || "Not set"}
+              </p>
+              <p>
+                <strong>Powerbanks:</strong> {powerbanks || "Not set"}
+              </p>
+              <p>
+                <strong>Amenities:</strong>{" "}
+                {amenities.length > 0 ? amenities.join(", ") : "None"}
+              </p>
+              <p>
+                <strong>Coordinates:</strong> Lat: {latitude || "Not set"}, Lng:{" "}
+                {longitude || "Not set"}
+              </p>
+              {imagePreview && typeof imagePreview === "string" && (
+                <img
+                  src={imagePreview}
+                  alt="Location"
+                  style={{
+                    width: "100%",
+                    borderRadius: "8px",
+                    marginTop: "10px",
+                    objectFit: "cover",
+                  }}
+                />
+              )}
               <div className={styles.actions}>
                 <button className={styles.confirmButton} onClick={handleConfirmStation}>
                   Confirm <FiChevronRight />
@@ -234,6 +297,7 @@ const AddStationPage: React.FC = () => {
             </div>
           </>
         );
+
       default:
         return null;
     }
@@ -244,15 +308,14 @@ const AddStationPage: React.FC = () => {
       case 1:
         return (
           <>
-            <div className={styles.previewBox}>
-              {/* Optional: Add a station icon or placeholder image here */}
-            </div>
+            <div className={styles.previewBox}></div>
             <div className={styles.previewDetails}>
               <h3>{stationName || "Station Preview"}</h3>
               <p>{location || "Station location will appear here"}</p>
             </div>
           </>
         );
+
       case 2:
         return (
           <>
@@ -272,14 +335,32 @@ const AddStationPage: React.FC = () => {
             </div>
           </>
         );
+
       case 3:
         return (
           <>
             <div className={styles.previewBox}>
               {imagePreview ? (
-                <img src={imagePreview} alt="Location Preview" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                <img
+                  src={imagePreview}
+                  alt="Location Preview"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
               ) : (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#aaa" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                    color: "#aaa",
+                  }}
+                >
                   <FaImage size={40} />
                   <p style={{ marginLeft: "10px" }}>Upload image to preview</p>
                 </div>
@@ -291,14 +372,34 @@ const AddStationPage: React.FC = () => {
             </div>
           </>
         );
+
       case 4:
         return (
           <>
             <div className={styles.previewBox}>
               {imagePreview ? (
-                <img src={imagePreview} alt="Final Preview" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                <img
+                  src={imagePreview}
+                  alt="Final Preview"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
               ) : (
-                <div style={{ background: "#2f2f2f", borderRadius: "8px", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#39ff14" }}>
+                <div
+                  style={{
+                    background: "#2f2f2f",
+                    borderRadius: "8px",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#39ff14",
+                  }}
+                >
                   <FaCheckCircle size={50} />
                 </div>
               )}
@@ -342,9 +443,7 @@ const AddStationPage: React.FC = () => {
           })}
         </div>
 
-        <div className={styles.formSection}>
-          {renderStepContent()}
-        </div>
+        <div className={styles.formSection}>{renderStepContent()}</div>
 
         <div className={styles.navigationActions}>
           {currentStep > 1 && currentStep !== 4 && (
@@ -362,12 +461,8 @@ const AddStationPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side Preview */}
-      <div className={styles.preview}>
-        {renderPreviewContent()}
-      </div>
+      <div className={styles.preview}>{renderPreviewContent()}</div>
 
-      {/* Confirm Modal */}
       {showConfirmModal && (
         <div className={styles.confirmOverlay}>
           <div className={styles.confirmPopup}>
