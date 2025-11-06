@@ -29,11 +29,11 @@ const StationsPage: React.FC = () => {
 
     const handleEdit = (id: string, e: React.MouseEvent) => {
         e.stopPropagation(); // prevent row click
-        router.push(`/stations/${id}`);
+        router.push(`/dashboard/stations/${id}`);
     };
 
     const handleRowClick = (id: string) => {
-        router.push(`dashboard/stations/${id}`);
+        router.push(`/dashboard/stations/${id}`);
     };
 
     const handleAdd = () => {

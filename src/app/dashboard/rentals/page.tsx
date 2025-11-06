@@ -43,19 +43,6 @@ export default function RentalsPage() {
     }
   };
 
-  // 🔹 SORT FUNCTIONALITY
-  const handleSort = () => {
-    const sortedData = [...filteredData].sort((a, b) => {
-      const valA = a.station.toLowerCase();
-      const valB = b.station.toLowerCase();
-      return sortOrder === "asc"
-        ? valA.localeCompare(valB)
-        : valB.localeCompare(valA);
-    });
-    setFilteredData(sortedData);
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
   // 🔹 EXPORT CSV FUNCTIONALITY
   const handleExportCSV = () => {
     const headers = [
@@ -109,13 +96,6 @@ export default function RentalsPage() {
             {tab}
           </button>
         ))}
-      </div>
-
-      {/* Controls */}
-      <div className={styles.controls}>
-        <button className={styles.sortBtn} onClick={handleSort}>
-          <FiFilter className={styles.icon} /> Sort By Station
-        </button>
       </div>
 
       {/* Table Card */}

@@ -4,10 +4,10 @@ import { useState } from "react";
 import Modal from "../../../components/modal/modal";
 import styles from "./settings.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
-import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
 export default function SettingsPage() {
     // ================= STATE =================
+    const [isActive, setIsActive] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState("");
     const [selectedSection, setSelectedSection] = useState("");
@@ -203,12 +203,21 @@ export default function SettingsPage() {
                                 <td>{a.points} pts</td>
                                 <td>{a.difficulty}</td>
                                 <td>
-                                    <span
-                                        className={`${styles.status} ${a.active ? styles.active : styles.inactive
-                                            }`}
-                                    >
-                                        {a.active ? "Active" : "Inactive"}
-                                    </span>
+                                    <div className={styles.statusRow}>
+                                        <span>Status</span>
+                                        <div
+                                            className={`${styles.toggle} ${isActive ? styles.active : ""}`}
+                                            onClick={() => setIsActive(!isActive)}
+                                        >
+                                            <div className={styles.knob}></div>
+                                        </div>
+                                        <span
+                                            className={`${styles.statusText} ${isActive ? styles.activeText : ""
+                                                }`}
+                                        >
+                                            {isActive ? "Active" : "Inactive"}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td>
                                     <button className={styles.editBtn}><FiEdit /></button>

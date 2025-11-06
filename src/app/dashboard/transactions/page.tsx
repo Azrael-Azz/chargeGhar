@@ -5,11 +5,11 @@ import styles from "./transactions.module.css";
 import { FiDownload, FiFilter } from "react-icons/fi";
 
 const transactions = [
-    { id: "1", user: "9812345678", amount: 500, method: "Discover", status: "Pending", date: "2025-09-08" },
-    { id: "2", user: "9801234567", amount: 500, method: "Khalti", status: "Failed", date: "2025-09-07" },
+    { id: "1", user: "9812345678", amount: 800, method: "Discover", status: "Pending", date: "2025-09-08" },
+    { id: "2", user: "9801234567", amount: 300, method: "Khalti", status: "Failed", date: "2025-09-07" },
     { id: "3", user: "9865345678", amount: 500, method: "Visa", status: "Success", date: "2025-09-06" },
-    { id: "4", user: "9823456789", amount: 500, method: "Esewa", status: "Success", date: "2025-09-05" },
-    { id: "5", user: "9817345678", amount: 500, method: "TopupOut", status: "Failed", date: "2025-09-04" },
+    { id: "4", user: "9823456789", amount: 400, method: "Esewa", status: "Success", date: "2025-09-05" },
+    { id: "5", user: "9817345678", amount: 200, method: "TopupOut", status: "Failed", date: "2025-09-04" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -36,7 +36,6 @@ const Transactions: React.FC = () => {
     // ✅ Sort logic
     const sorted = [...filtered].sort((a, b) => {
         if (sortBy === "amount") return b.amount - a.amount;
-        if (sortBy === "status") return a.status.localeCompare(b.status);
         return new Date(b.date).getTime() - new Date(a.date).getTime();
     });
 
@@ -98,15 +97,6 @@ const Transactions: React.FC = () => {
                                 }}
                             >
                                 Amount
-                            </div>
-                            <div
-                                className={`${styles.dropdownItem} ${sortBy === "status" ? styles.selected : ""}`}
-                                onClick={() => {
-                                    setSortBy("status");
-                                    setDropdownOpen(false);
-                                }}
-                            >
-                                Status
                             </div>
                         </div >
                     )

@@ -4,8 +4,9 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "./Header.module.css";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FiBell, FiUser, FiLogOut, FiSettings } from "react-icons/fi";
+import { FiBell, FiUser, FiLogOut } from "react-icons/fi";
 import logo from "../../../public/ChargeGharLogo.png";
+import Notifications from "../../components/notifications/notifications";
 
 const Header: React.FC = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -58,6 +59,8 @@ const Header: React.FC = () => {
                 {/* Notification Icon */}
                 <button className={styles.iconButton} aria-label="Notifications">
                     <FiBell />
+                    {/* Notification Icon */}
+                    <Notifications />
                 </button>
 
                 {/* Profile Dropdown */}
