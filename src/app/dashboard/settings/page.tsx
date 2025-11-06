@@ -1,26 +1,51 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../../../components/modal/modal";
 import styles from "./settings.module.css";
 import { FiEdit, FiTrash2, FiPlus, FiUser, FiLock } from "react-icons/fi";
 import { useDashboardData } from "../../../contexts/DashboardDataContext";
-
+import axios from '../../../lib/axios';
+import { isAxiosError } from "axios";
 export default function SettingsPage() {
     // ================= STATE =================
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalTitle, setModalTitle] = useState("");
     const [selectedSection, setSelectedSection] = useState("");
 
+    // Coupon form states
+    const [couponCode, setCouponCode] = useState("");
+    const [couponName, setCouponName] = useState("");
+    const [pointsValue, setPointsValue] = useState("");
+    const [maxUsesPerUser, setMaxUsesPerUser] = useState("");
+    const [validFrom, setValidFrom] = useState("");
+    const [validUntil, setValidUntil] = useState("");
+
     const [packages] = useState([
         { id: 1, name: "1 Hour Package", duration: "1 Hour", price: "₹100", active: true },
         { id: 2, name: "1 Day Package", duration: "1 Day", price: "₹500", active: false },
     ]);
 
-    const [coupons] = useState([
-        { id: 1, code: "SAVE10", discount: "10%", status: "Active" },
-        { id: 2, code: "FREEDAY", discount: "100%", status: "Expired" },
-    ]);
+    const [coupons, setCoupons] = useState<any[]>([]);
+    const [pagination, setPagination] = useState<any>(null);
+
+
+    const fetchCoupons = async (page = 1) => {
+        try {
+            const pageSize = 5; // Set page size to 5
+            const response = await axios.get(`/api/admin/coupons?page=${page}&page_size=${pageSize}`);
+            if (response.data.success) {
+                setCoupons(response.data.data.results);
+                setPagination(response.data.data.pagination);
+            }
+        } catch (error) {
+            console.error("Error fetching coupons:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCoupons(1);
+    }, []);
 
     const [achievements] = useState([
         { id: 1, name: "Make First Purchase", points: 100, difficulty: "Easy", active: true },
@@ -63,6 +88,72 @@ export default function SettingsPage() {
 
         alert("Password updated successfully!");
         handleCloseModal();
+    };
+
+    const handleCreateCoupon = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('code', couponCode);
+        formData.append('name', couponName);
+        formData.append('points_value', pointsValue);
+        formData.append('max_uses_per_user', maxUsesPerUser);
+        formData.append('valid_from', validFrom);
+        formData.append('valid_until', validUntil);
+
+        try {
+            const response = await axios.post('/api/admin/coupons', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+            
+            if (response.data.success) {
+                console.log('Coupon created successfully:', response.data);
+                alert(response.data.message);
+                handleCloseModal();
+                // Clear form fields on success
+                setCouponCode("");
+                setCouponName("");
+                setPointsValue("");
+                setMaxUsesPerUser("");
+                setValidFrom("");
+                setValidUntil("");
+                fetchCoupons(); // Refresh the coupon list
+            } else {
+                console.error('Error creating coupon:', response.data.message);
+                alert(response.data.message);
+            }
+        } catch (error) {
+            console.error('Error creating coupon:', error);
+            if (isAxiosError(error) && error.response) {
+                const errorMessage = error.response.data.message || 'Failed to create coupon.';
+                alert(errorMessage);
+            } else {
+                alert('Failed to create coupon.');
+            }
+        }
+    };
+
+    const handleDelete = async (code: string) => {
+        if (window.confirm(`Are you sure you want to delete coupon ${code}?`)) {
+            try {
+                const response = await axios.delete(`/api/admin/coupons/${code}`);
+                if (response.data.success) {
+                    alert(response.data.message);
+                    fetchCoupons(); // Refresh the list
+                } else {
+                    alert(response.data.message);
+                }
+            } catch (error) {
+                console.error("Error deleting coupon:", error);
+                if (isAxiosError(error) && error.response) {
+                    alert(error.response.data.message || "Failed to delete coupon.");
+                } else {
+                    alert("Failed to delete coupon.");
+                }
+            }
+        }
     };
 
     return (
@@ -135,7 +226,8 @@ export default function SettingsPage() {
                         <tr>
                             <th>Coupon ID</th>
                             <th>Coupon Code</th>
-                            <th>Discount</th>
+                            <th>Name</th>
+                            <th>Points Value</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -145,10 +237,11 @@ export default function SettingsPage() {
                             <tr key={c.id}>
                                 <td>{c.id}</td>
                                 <td>{c.code}</td>
-                                <td>{c.discount}</td>
+                                <td>{c.name}</td>
+                                <td>{c.points_value}</td>
                                 <td>
                                     <span
-                                        className={`${styles.status} ${c.status === "Active" ? styles.active : styles.inactive
+                                        className={`${styles.status} ${c.status === "active" ? styles.active : styles.inactive
                                             }`}
                                     >
                                         {c.status}
@@ -156,12 +249,32 @@ export default function SettingsPage() {
                                 </td>
                                 <td>
                                     <button className={styles.editBtn}><FiEdit /></button>
-                                    <button className={styles.deleteBtn}><FiTrash2 /></button>
+                                    <button className={styles.deleteBtn} onClick={() => handleDelete(c.code)}><FiTrash2 /></button>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                {pagination && (
+                    <div className={styles.pagination}>
+                        <button 
+                            onClick={() => fetchCoupons(pagination.previous_page)}
+                            disabled={!pagination.has_previous}
+                        >
+                            Previous
+                        </button>
+                        <span>
+                            Page {pagination.current_page} of {pagination.total_pages}
+                        </span>
+                        <button 
+                            onClick={() => fetchCoupons(pagination.next_page)}
+                            disabled={!pagination.has_next}
+                        >
+                            Next
+                        </button>
+                    </div>
+                )}
             </section>
 
             {/* ================= ACHIEVEMENTS SECTION ================= */}
@@ -332,13 +445,21 @@ export default function SettingsPage() {
                 )}
 
                 {selectedSection === "coupon" && (
-                    <>
+                    <form onSubmit={handleCreateCoupon}>
                         <label>Coupon Code</label>
-                        <input type="text" placeholder="Enter coupon code" />
-                        <label>Discount (%)</label>
-                        <input type="text" placeholder="Enter discount" />
-                        <button className={styles.saveBtn}>Save</button>
-                    </>
+                        <input type="text" placeholder="Enter coupon code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} required />
+                        <label>Coupon Name</label>
+                        <input type="text" placeholder="Enter coupon name" value={couponName} onChange={(e) => setCouponName(e.target.value)} required />
+                        <label>Points Value</label>
+                        <input type="number" placeholder="Enter points value" value={pointsValue} onChange={(e) => setPointsValue(e.target.value)} required />
+                        <label>Max Uses Per User</label>
+                        <input type="number" placeholder="Enter max uses per user" value={maxUsesPerUser} onChange={(e) => setMaxUsesPerUser(e.target.value)} required />
+                        <label>Valid From</label>
+                        <input type="datetime-local" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} required />
+                        <label>Valid Until</label>
+                        <input type="datetime-local" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} required />
+                        <button type="submit" className={styles.saveBtn}>Create Coupon</button>
+                    </form>
                 )}
 
                 {selectedSection === "achievement" && (

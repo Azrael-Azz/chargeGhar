@@ -22,7 +22,7 @@ instance.interceptors.request.use(
 );
 
 // Function to get CSRF token from cookies
-const getCsrfToken = () => {
+export const getCsrfToken = () => {
   if (typeof window === 'undefined') {
     return null;
   }
