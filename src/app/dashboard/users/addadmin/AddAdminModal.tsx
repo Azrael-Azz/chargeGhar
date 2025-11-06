@@ -1,205 +1,173 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import { FaRegImage } from "react-icons/fa6";
 import styles from "./AddAdminModal.module.css";
+import instance from "../../../../lib/axios";
+import { useDashboardData } from "../../../../contexts/DashboardDataContext";
+import { getCsrfToken } from "../../../../lib/axios";
 
-export default function AddAdminModal({ onClose }: { onClose: () => void }) {
-  const [isActive, setIsActive] = useState(true);
-  const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [recentProfiles, setRecentProfiles] = useState<string[]>([]);
+interface AddAdminModalProps {
+  onClose: () => void;
+  onSuccess: () => void;
+}
 
-  // Handle uploaded image
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const imageData = reader.result as string;
-        setProfileImage(imageData);
-        setRecentProfiles((prev) => [imageData, ...prev.slice(0, 2)]);
-      };
-      reader.readAsDataURL(file);
+export default function AddAdminModal({
+  onClose,
+  onSuccess,
+}: AddAdminModalProps) {
+  const { usersData, loading: usersLoading } = useDashboardData();
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [role, setRole] = useState<string>("admin");
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const users = usersData?.results || [];
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    if (!selectedUserId) {
+      setError("Please select a user");
+      return;
+    }
+
+    if (!password || password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const csrfToken = getCsrfToken();
+
+      const response = await instance.post(
+        "/api/admin/profiles",
+        {
+          user: parseInt(selectedUserId),
+          role: role,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFTOKEN": csrfToken || "",
+          },
+        },
+      );
+
+      if (response.data.success) {
+        setSuccessMessage("Admin profile created successfully!");
+        setTimeout(() => {
+          onSuccess();
+        }, 1500);
+      } else {
+        setError(response.data.message || "Failed to create admin profile");
+      }
+    } catch (err: any) {
+      console.error("Error creating admin profile:", err);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to create admin profile";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      {/* --- MAIN ADD ADMIN POPUP --- */}
-      <div className={styles.overlay}>
-        <div className={styles.modal}>
-          {/* Clickable Profile Icon */}
-          <div
-            className={styles.profileIcon}
-            onClick={() => setShowProfilePopup(true)}
-          >
-            <div className={styles.iconCircle}>
-              {profileImage ? (
-                <>
-                  <Image
-                    src={profileImage}
-                    alt="Profile"
-                    width={90}
-                    height={90}
-                    className={styles.recentImg}
-                  />
-                  <div className={styles.editOverlay}>Edit</div>
-                </>
-              ) : (
-                <>
-                  👤
-                  <div className={styles.editOverlay}>Edit</div>
-                </>
-              )}
-            </div>
-          </div>
+    <div className={styles.overlay}>
+      <div className={styles.modal}>
+        <h2 className={styles.title}>Create Admin Profile</h2>
+        <p className={styles.subtitle}>
+          Select a user and assign them an admin role
+        </p>
 
-          <h2 className={styles.title}>Personal Information</h2>
+        {error && <div className={styles.errorMessage}>{error}</div>}
 
-          <form className={styles.form}>
-            <div className={styles.row}>
-              <label>
-                Name
-                <input type="text" placeholder="<username>" />
-              </label>
+        {successMessage && (
+          <div className={styles.successMessage}>{successMessage}</div>
+        )}
 
-              <label>
-                Role
-                <select>
-                  <option>Admin</option>
-                  <option>Editor</option>
-                  <option>Viewer</option>
-                </select>
-              </label>
-            </div>
-
-            <div className={styles.row}>
-              <label>
-                Email Address
-                <input type="email" placeholder="<emailaddress>" required />
-              </label>
-
-              <label>
-                Phone Number
-                <input type="tel" placeholder="<phoneno>" required />
-              </label>
-            </div>
-
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.formGroup}>
             <label>
-              Password
-              <input type="password" placeholder="<password>" required />
+              Select User <span className={styles.required}>*</span>
             </label>
-
-            <div className={styles.statusRow}>
-              <span>Status</span>
-              <div
-                className={`${styles.toggle} ${isActive ? styles.active : ""}`}
-                onClick={() => setIsActive(!isActive)}
-              >
-                <div className={styles.knob}></div>
-              </div>
-              <span
-                className={`${styles.statusText} ${isActive ? styles.activeText : ""
-                  }`}
-              >
-                {isActive ? "Active" : "Inactive"}
-              </span>
-            </div>
-
-            <div className={styles.access}>
-              <span>Access Level</span>
-              <div className={styles.accessGrid}>
-                <label><input type="checkbox" /> Station</label>
-                <label><input type="checkbox" /> Transactions</label>
-                <label><input type="checkbox" /> Users</label>
-                <label><input type="checkbox" /> Settings</label>
-                <label><input type="checkbox" /> Rentals</label>
-              </div>
-            </div>
-
-            <div className={styles.buttons}>
-              <button
-                type="button"
-                className={styles.cancelBtn}
-                onClick={onClose}
-              >
-                Cancel
-              </button>
-              <button type="submit" className={styles.createBtn}>
-                Create Admin
-              </button>
-            </div>
-          </form>
-        </div >
-      </div >
-
-      {/* --- PROFILE PICTURE POPUP --- */}
-      {
-        showProfilePopup && (
-          <div className={styles.popupOverlay}>
-            <div className={styles.popup}>
-              <h3>Change your Profile Picture</h3>
-              <p className={styles.subText}>Select an Image</p>
-
-              <div className={styles.popupOptions}>
-                {/* Choose an image */}
-                <label className={styles.optionBox}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={handleImageChange}
-                  />
-                  <div>
-                    <p className={styles.optionIcon}><FaRegImage />
-                    </p>
-                    <p>Choose an Image</p>
-                  </div>
-                </label>
-              </div>
-
-              {/* Recent Profiles */}
-              <div className={styles.recentSection}>
-                <p>Recent Profiles</p>
-                <div className={styles.recentList}>
-                  {recentProfiles.length > 0 ? (
-                    recentProfiles.map((img, i) => (
-                      <Image
-                        key={i}
-                        src={img}
-                        alt="Recent"
-                        width={60}
-                        height={60}
-                        className={styles.recentImg}
-                        onClick={() => setProfileImage(img)}
-                      />
-                    ))
-                  ) : (
-                    <div className={styles.emptyCircle}></div>
-                  )}
-                </div>
-              </div>
-
-              <div className={styles.popupButtons}>
-                <button
-                  className={styles.cancelBtn}
-                  onClick={() => setShowProfilePopup(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className={styles.confirmBtn}
-                  onClick={() => setShowProfilePopup(false)}
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
+            <select
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              required
+              disabled={usersLoading || loading}
+            >
+              <option value="">-- Select a user --</option>
+              {users.map((user: any) => (
+                <option key={user.id} value={user.id}>
+                  {user.username} ({user.id}) - {user.social_provider}
+                </option>
+              ))}
+            </select>
           </div>
-        )
-      }
-    </>
+
+          <div className={styles.formGroup}>
+            <label>
+              Role <span className={styles.required}>*</span>
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+              disabled={loading}
+            >
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>
+              Password <span className={styles.required}>*</span>
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter admin password (min 8 characters)"
+              required
+              minLength={8}
+              disabled={loading}
+            />
+            <small className={styles.hint}>
+              This password will be used for the admin to login
+            </small>
+          </div>
+
+          <div className={styles.buttons}>
+            <button
+              type="button"
+              className={styles.cancelBtn}
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={styles.createBtn}
+              disabled={loading || !selectedUserId || !password}
+            >
+              {loading ? "Creating..." : "Create Admin"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
