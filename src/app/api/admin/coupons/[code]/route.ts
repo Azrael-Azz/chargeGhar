@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { AxiosError } from 'axios';
 
-export async function DELETE(req: NextRequest, { params }: { params: { code: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
     const { code } = await params;
 
