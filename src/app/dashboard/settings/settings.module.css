@@ -363,7 +363,7 @@
     color: rgb(10, 237, 10);
 }
 
-/* ================= FORM STYLING ================= */
+/* FORM STYLING for Password and Coupon  */
 .container form {
     display: flex;
     flex-direction: column;

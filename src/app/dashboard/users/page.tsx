@@ -15,52 +15,55 @@ import AddAdminModal from "./addadmin/AddAdminModal";
 import { useDashboardData } from "../../../contexts/DashboardDataContext";
 
 interface User {
+  id: number;
+  username: string;
+  profile_picture: string | null;
+  referral_code: string | null;
+  status: string;
+  date_joined: string;
+  profile_complete: boolean;
+  kyc_status: string;
+  social_provider: string;
+}
+
+interface AdminProfile {
   id: string;
-  name: string;
+  role: string;
+  is_active: boolean;
+  is_super_admin: boolean;
+  created_at: string;
+  updated_at: string;
+  username: string;
   email: string;
-  phone: string;
-  rentals: string;
-  createdAt: string;
+  created_by_username: string;
 }
 
 export default function UsersPage() {
-  const { dashboardData, loading, error } = useDashboardData();
+  const {
+    profilesData,
+    usersData,
+    loading,
+    error,
+    refetchProfiles,
+    refetchUsers,
+  } = useDashboardData();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<keyof User>("id");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [showSortMenu, setShowSortMenu] = useState(false);
 
-  // Static mock data — defined inside component
-  const usersData: User[] = [
-    {
-      id: "U001",
-      name: "User One",
-      email: "user1@email.com",
-      phone: "9841111111",
-      rentals: "3",
-      createdAt: "08/09/2025",
-    },
-    {
-      id: "U002",
-      name: "User Two",
-      email: "user2@email.com",
-      phone: "9852222222",
-      rentals: "5",
-      createdAt: "08/09/2025",
-    },
-  ];
-
   const sortOptions: { key: keyof User; label: string }[] = [
     { key: "id", label: "ID" },
-    { key: "name", label: "Name" },
-    { key: "email", label: "Email" },
-    { key: "phone", label: "Phone No." },
-    { key: "rentals", label: "Rentals" },
-    { key: "createdAt", label: "Created Date" },
+    { key: "username", label: "Name" },
+    { key: "status", label: "Status" },
+    { key: "kyc_status", label: "KYC Status" },
+    { key: "social_provider", label: "Provider" },
+    { key: "date_joined", label: "Created Date" },
   ];
 
-  const admins = dashboardData?.profiles || [];
+  const admins: AdminProfile[] = profilesData || [];
+  const users: User[] = usersData?.results || [];
 
   const handleSortSelect = (key: keyof User) => {
     if (sortKey === key) {
@@ -73,44 +76,44 @@ export default function UsersPage() {
   };
 
   const displayedUsers = useMemo((): User[] => {
-    let list: User[] = [...usersData];
+    let list: User[] = [...users];
 
-    // Search: filter by ID, name, email, phone
+    // Search: filter by ID, username, status
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      const phoneDigits = search.replace(/\D/g, "");
       list = list.filter(
         (u) =>
-          u.id.toLowerCase().includes(q) ||
-          u.name.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q) ||
-          u.phone.includes(phoneDigits)
+          u.id.toString().includes(q) ||
+          u.username.toLowerCase().includes(q) ||
+          u.status.toLowerCase().includes(q) ||
+          (u.referral_code && u.referral_code.toLowerCase().includes(q)),
       );
     }
 
     // Sort
     return list.sort((a, b) => {
-      let aVal: string | number = a[sortKey];
-      let bVal: string | number = b[sortKey];
+      let aVal: string | number | boolean | null = a[sortKey];
+      let bVal: string | number | boolean | null = b[sortKey];
 
-      if (sortKey === "id" || sortKey === "rentals") {
+      if (sortKey === "id") {
         aVal = Number(aVal);
         bVal = Number(bVal);
-      } else if (sortKey === "createdAt") {
-        const [d1, m1, y1] = aVal.split("/").map(Number);
-        const [d2, m2, y2] = bVal.split("/").map(Number);
-        aVal = new Date(y1, m1 - 1, d1).getTime();
-        bVal = new Date(y2, m2 - 1, d2).getTime();
+      } else if (sortKey === "date_joined") {
+        aVal = new Date(aVal as string).getTime();
+        bVal = new Date(bVal as string).getTime();
+      } else if (sortKey === "profile_complete") {
+        aVal = aVal ? 1 : 0;
+        bVal = bVal ? 1 : 0;
       } else {
-        aVal = String(aVal).toLowerCase();
-        bVal = String(bVal).toLowerCase();
+        aVal = String(aVal || "").toLowerCase();
+        bVal = String(bVal || "").toLowerCase();
       }
 
       if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
       if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-  }, [search, sortKey, sortDir, usersData]);
+  }, [search, sortKey, sortDir, users]);
 
   if (loading) {
     return <main className={styles.container}>Loading...</main>;
@@ -130,10 +133,7 @@ export default function UsersPage() {
       </header>
 
       <div className={styles.addButtonWrapper}>
-        <button
-          className={styles.addButton}
-          onClick={() => setShowModal(true)}
-        >
+        <button className={styles.addButton} onClick={() => setShowModal(true)}>
           + Add Admin
         </button>
       </div>
@@ -153,34 +153,58 @@ export default function UsersPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
+              <th>Username</th>
               <th>Email</th>
-              <th>Phone No.</th>
               <th>Role</th>
               <th>Status</th>
               <th>Created Date</th>
+              <th>Created By</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {admins.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", padding: "2rem", color: "#888" }}>
+                <td
+                  colSpan={8}
+                  style={{
+                    textAlign: "center",
+                    padding: "2rem",
+                    color: "#888",
+                  }}
+                >
                   No admins found
                 </td>
               </tr>
             ) : (
-              admins.map((admin: any) => (
+              admins.map((admin: AdminProfile) => (
                 <tr key={admin.id}>
-                  <td>{admin.id}</td>
-                  <td>{admin.name}</td>
+                  <td>{admin.id.slice(0, 8)}...</td>
+                  <td>{admin.username}</td>
                   <td>{admin.email}</td>
-                  <td>{admin.phone}</td>
-                  <td>{admin.role || "Admin"}</td>
                   <td>
-                    <span className={styles.statusActive}>Active</span>
+                    <span
+                      style={{
+                        textTransform: "capitalize",
+                        color: admin.is_super_admin ? "#32cd32" : "#ccc",
+                      }}
+                    >
+                      {admin.role.replace("_", " ")}
+                    </span>
                   </td>
-                  <td>{admin.created_at || admin.createdAt || "—"}</td>
+                  <td>
+                    <span
+                      className={
+                        admin.is_active
+                          ? styles.statusActive
+                          : styles.statusInactive
+                      }
+                    >
+                      {admin.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td>{new Date(admin.created_at).toLocaleDateString()}</td>
+                  <td>{admin.created_by_username}</td>
                   <td>
                     <button className={styles.deleteBtn} title="Delete admin">
                       <FiTrash2 />
@@ -212,7 +236,10 @@ export default function UsersPage() {
             placeholder="Search users..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: "2.5rem", paddingRight: search ? "2rem" : "1rem" }}
+            style={{
+              paddingLeft: "2.5rem",
+              paddingRight: search ? "2rem" : "1rem",
+            }}
           />
           {search && (
             <button
@@ -250,7 +277,9 @@ export default function UsersPage() {
           >
             <FiArrowDown style={{ fontSize: "1rem" }} />
             Sort By
-            <FiChevronDown style={{ fontSize: "0.8rem", marginLeft: "0.25rem" }} />
+            <FiChevronDown
+              style={{ fontSize: "0.8rem", marginLeft: "0.25rem" }}
+            />
           </button>
 
           {/* SORT OPTIONS */}
@@ -327,10 +356,11 @@ export default function UsersPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone No.</th>
-              <th>Rentals</th>
+              <th>Username</th>
+              <th>Referral Code</th>
+              <th>Provider</th>
+              <th>Profile Status</th>
+              <th>KYC Status</th>
               <th>Status</th>
               <th>Created Date</th>
               <th></th>
@@ -340,7 +370,7 @@ export default function UsersPage() {
             {displayedUsers.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   style={{
                     textAlign: "center",
                     padding: "2rem",
@@ -355,14 +385,48 @@ export default function UsersPage() {
               displayedUsers.map((user) => (
                 <tr key={user.id}>
                   <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.rentals}</td>
+                  <td>{user.username}</td>
+                  <td>{user.referral_code || "—"}</td>
                   <td>
-                    <span className={styles.statusActive}>Active</span>
+                    <span style={{ textTransform: "capitalize" }}>
+                      {user.social_provider.toLowerCase()}
+                    </span>
                   </td>
-                  <td>{user.createdAt}</td>
+                  <td>
+                    <span
+                      style={{
+                        color: user.profile_complete ? "#32cd32" : "#ff8c00",
+                      }}
+                    >
+                      {user.profile_complete ? "Complete" : "Incomplete"}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        color:
+                          user.kyc_status === "APPROVED"
+                            ? "#32cd32"
+                            : user.kyc_status === "PENDING"
+                              ? "#ff8c00"
+                              : "#888",
+                      }}
+                    >
+                      {user.kyc_status.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className={
+                        user.status === "ACTIVE"
+                          ? styles.statusActive
+                          : styles.statusInactive
+                      }
+                    >
+                      {user.status}
+                    </span>
+                  </td>
+                  <td>{new Date(user.date_joined).toLocaleDateString()}</td>
                   <td>
                     <button className={styles.deleteBtn} title="Delete user">
                       <FiTrash2 />
@@ -375,7 +439,15 @@ export default function UsersPage() {
         </table>
       </section>
 
-      {showModal && <AddAdminModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <AddAdminModal
+          onClose={() => setShowModal(false)}
+          onSuccess={() => {
+            refetchProfiles();
+            setShowModal(false);
+          }}
+        />
+      )}
     </main>
   );
 }
