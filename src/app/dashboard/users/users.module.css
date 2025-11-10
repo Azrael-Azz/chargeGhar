@@ -1,14 +1,14 @@
 .container {
     color: #fff;
     background-color: #0b0b0b;
+    margin-left: 1rem;
+    padding: 2rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 5rem;
-    margin-left: 3rem;
-    margin-top: 2rem;
 }
 
+/* ---------- Typography ---------- */
 .title {
     font-size: 2rem;
     font-weight: 600;
@@ -20,6 +20,7 @@
     margin-bottom: 1.5rem;
 }
 
+/* ---------- Add Button ---------- */
 .addButtonWrapper {
     display: flex;
     justify-content: flex-end;
@@ -34,8 +35,15 @@
     border-radius: 9999px;
     border: none;
     cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
+.addButton:hover {
+    background-color: #46e246;
+    transform: translateY(-1px);
+}
+
+/* ---------- Card ---------- */
 .card {
     background-color: #121212;
     border: 1px solid #2a2a2a;
@@ -63,6 +71,7 @@
     color: #8c8c8c;
 }
 
+/* ---------- Table ---------- */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -84,6 +93,7 @@
     border-top: 1px solid #2a2a2a;
 }
 
+/* ---------- Status Styles ---------- */
 .statusActive {
     color: #00ff99;
     font-weight: 500;
@@ -94,19 +104,14 @@
     font-weight: 500;
 }
 
-.deleteBtn {
-    background: transparent;
-    border: none;
-    color: #ff4d4d;
-    cursor: pointer;
-    font-size: 1.1rem;
-}
-
+/* ---------- Controls ---------- */
 .controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 1rem 0;
+    flex-wrap: wrap;
+    gap: 0.8rem;
 }
 
 .search {
@@ -116,6 +121,11 @@
     border: 1px solid #2a2a2a;
     background-color: transparent;
     color: #fff;
+    transition: border 0.3s ease;
+}
+
+.search:focus {
+    border-color: #47b216;
 }
 
 .sortBtn {
@@ -124,8 +134,69 @@
     color: #ccc;
     font-size: 0.9rem;
     cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.sortBtn:hover {
+    color: #82ea80;
 }
 
 .icon {
     font-size: 1rem;
+}
+
+/* ---------- Buttons ---------- */
+.deleteBtn {
+    background: transparent;
+    border: none;
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.deleteBtn:hover {
+    transform: scale(1.1);
+    color: #ff6666;
+}
+
+/* ---------- Clickable Row ---------- */
+.clickableRow {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickableRow:hover {
+    background-color: #1a1a1a;
+    border-left: 2px solid #82ea80;
+}
+
+.clickableRow:focus {
+    outline: 2px solid #82ea80;
+    outline-offset: -2px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search {
+        width: 100%;
+    }
+
+    .addButtonWrapper {
+        justify-content: center;
+    }
+
+    .tableContainer {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        min-width: 500px;
+    }
 }
